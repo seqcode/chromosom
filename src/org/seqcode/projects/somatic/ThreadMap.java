@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * @author trk5150
  *
  */
- 
+//Test addition to make sure commits and builds are working on cluster because I'm not sure I can set anything up correctly
 public class ThreadMap
 {
 	public Reader reader;
