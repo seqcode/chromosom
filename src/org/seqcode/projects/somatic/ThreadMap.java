@@ -9,13 +9,14 @@ import java.util.ArrayList;
 
 /**
  * To Do:
- * check to confirm neighborhood function is working
- * reduce percent unoccupied data points
+ * nFactor cuttoff
+ * average vector of assigned dps
+ * 
  * 
  * @author trk5150
  *
  */
-
+ 
 public class ThreadMap
 {
 	public Reader reader;
