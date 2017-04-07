@@ -158,8 +158,8 @@ public class ThreadMap
 				{
 					double initdist = -1;
 					int chr = dpChr[i];
-					double[] dpSmall = new double[dpSize-chr];
-					double[] nodeSmall = new double[dpSize-chr];
+					double[] dpSmall = new double[dpSize-dpPerChr[chr-1]];
+					double[] nodeSmall = new double[dpSize-dpPerChr[chr-1]];
 					int counter = 0;
 					for(int j = 0; j < dpSize; j++)
 					{
@@ -183,8 +183,6 @@ public class ThreadMap
 					
 					/// [count] vs [k]
 					int bestNode = 0;
-					double bestNodeMag = 0;
-					double[] bestNodeSmall = new double[nodeSmall.length];
 					for(int j = 0; j < nodeNum; j++) 					//Each data point goes through each Node looking for most similar
 					{
 						int county = 0;
