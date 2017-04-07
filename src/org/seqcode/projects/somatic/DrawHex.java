@@ -40,7 +40,7 @@ public class DrawHex extends JPanel
 	public double sep, cutoff;
 	public DrawHex(String s)
 	{
-		cutoff = 0.02;
+		cutoff = 0.01;
 		multi = false;
 		norm = false;//true;
 		swap=0;
@@ -933,7 +933,7 @@ public class DrawHex extends JPanel
 //			}
 //		}
 //		else 
-		if(weighting == true)
+		if(weighting == true && equalWeight==false)
 		{
 			minDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
 			maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
@@ -973,7 +973,7 @@ public class DrawHex extends JPanel
 				double d = p.counting.size();
 				double doop = maxDataPoints;
 				p.color = new Color(255, (int)(255-(d*255/doop)),(int)(255-d*255/doop));
-				if((swap == 1||swap == 3)&& p.counting.size()==0)
+				if((swap == 1||swap == 3) && p.counting.size()==0)
 					p.color = Color.GRAY;
 			}
 		}

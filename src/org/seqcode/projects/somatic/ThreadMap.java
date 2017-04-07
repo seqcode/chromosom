@@ -8,21 +8,16 @@ import java.util.ArrayList;
 
 
 /**
- * To Do:
- * nFactor cuttoff
- * average vector of assigned dps
- * 
  * 
  * @author trk5150
  *
  */
-//Test addition to make sure commits and builds are working on cluster because I'm not sure I can set anything up correctly
 public class ThreadMap
 {
 	public Reader reader;
-	public boolean cos;
+	public boolean cos, countIntraChromosomal;
 	
-	public int xNodes, yNodes,  count, dpSize, nodeNum, farthestNeighbor, threadNum;
+	public int xNodes, yNodes,  count, dpSize, nodeNum, farthestNeighbor, threadNum, maxDist, chrCount;
 	public double sgm, sgmStop, iterations, learningRate, alpha, pearsonQuality, cosineQuality, stability, zero, timerIterate, timerAssign, timerElse;
 	
 	IterateThread[] iThreads;
@@ -32,13 +27,15 @@ public class ThreadMap
 	boolean[][] assignments;
 	int[][] neighborly, threadLims;
 	int[] dpcount;
+	int[] dpChr,dpPerChr;
 	
 	double[] dpMag, nMag, weightsByHood;
 	
 	public String lander;
 	
-	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, int cosine, String name, String mat, int availibleThreads)
+	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, int cosine, String name, String mat, int availibleThreads, boolean countIntraChrom)
 	{
+		countIntraChromosomal = countIntraChrom;
 		sgmStop = sigmaStop;
 		iThreads = new IterateThread[availibleThreads];
 		aThreads = new AssignThread[availibleThreads];
@@ -51,7 +48,6 @@ public class ThreadMap
 		xNodes = xNode;
 		yNodes = yNode;
 		sgm = sigma;
-		//System.out.println(sgm+",  "+learningRate);
 		nodeNum = xNode * yNode;
 		iterations = it;
 		String ff = System.getProperty("user.dir") + "/"+mat;
@@ -80,19 +76,22 @@ public class ThreadMap
 				
 				for(int j = 0; j < neighborly[i].length; j++)        				//Cycles through neighborhood  (all nodes) for each node
 				{
-					double nj = dpcount[j];
-					double h = weightsByHood[neighborly[i][j]]; 							//neighborly = degree of separation between nodes				
-					double weight= nj*h;
-					
-					for(int k = 0; k<dpSize; k++)									//Cycles through the data points assigned to each Node in each shell
+					if(neighborly[i][j]<maxDist)
 					{
-						if(assignments[k][j])										//if currently examines node has give data points assigned to it, calculate
+						double nj = dpcount[j];
+						double h = weightsByHood[neighborly[i][j]]; 							//neighborly = degree of separation between nodes				
+						double weight= nj*h;
+						
+						for(int k = 0; k<dpSize; k++)									//Cycles through the data points assigned to each Node in each shell
 						{
-							for(int l = 0; l<dp[k].length; l++)
+							if(assignments[k][j])										//if currently examines node has give data points assigned to it, calculate
 							{
-								numVec[l] += dp[k][l]*weight;
+								for(int l = 0; l<dp[k].length; l++)
+								{
+									numVec[l] += dp[k][l]*weight;
+								}
+								sumDenom += weight;
 							}
-							sumDenom += weight;
 						}
 					}
 				}
@@ -120,35 +119,116 @@ public class ThreadMap
 		}
 		public void run()
 		{
-			for(int i = threadLims[thisT][0]; i <= threadLims[thisT][1]; i++)
+			if(countIntraChromosomal)
 			{
-				double initdist = 0;
-				
-				if(cos)
-					initdist = cosineSim(0, i);
-				else
-					initdist = pearson(0,i);
-				
-				int bestNode = 0;
-				for(int j = 0; j < nodeNum; j++) 					//Each data point goes through each Node looking for most similar
+				for(int i = threadLims[thisT][0]; i <= threadLims[thisT][1]; i++)
 				{
-					double dist = 0;
-					if(cos)
-						dist = cosineSim(j,i);
-					else
-						dist = pearson(j,i);
+					double initdist = -1;
 					
-					if(dist>initdist)  								//Node with highest cosine similarity value to data point = most similar
+					if(cos)
+						initdist = cosineSim(0, i);
+					else
+						initdist = pearson(0,i);
+					
+					int bestNode = 0;
+					for(int j = 0; j < nodeNum; j++) 					//Each data point goes through each Node looking for most similar
 					{
-						initdist = dist;
-						bestNode = j;
+						double dist = 0;
+						if(cos)
+							dist = cosineSim(j,i);
+						else
+							dist = pearson(j,i);
+						
+						if(dist>initdist)  								//Node with highest cosine similarity value to data point = most similar
+						{
+							initdist = dist;
+							bestNode = j;
+						}
 					}
+					if(initdist == 0)
+						System.out.print("shit");
+					//System.out.println(bestNode);
+					pAssign[i-threadLims[thisT][0]][bestNode] = true;
+					pp[bestNode]++;
 				}
-				if(initdist == 0)
-					System.out.println("shit");
-				//System.out.println(bestNode);
-				pAssign[i-threadLims[thisT][0]][bestNode] = true;
-				pp[bestNode]++;
+			}
+			else
+			{
+				for(int i = threadLims[thisT][0]; i <= threadLims[thisT][1]; i++)
+				{
+					double initdist = -1;
+					int chr = dpChr[i];
+					double[] dpSmall = new double[dpSize-chr];
+					double[] nodeSmall = new double[dpSize-chr];
+					int counter = 0;
+					for(int j = 0; j < dpSize; j++)
+					{
+						if(chr != dpChr[j])
+						{
+							//System.out.println(dpChr[j]+ "\t" + chr + "\t" + counter + "\t" + dp[i][j]);
+							dpSmall[counter] = dp[i][j];
+							counter++;
+						}
+					}
+					double magD = 0;
+					if(cos)
+					{
+						for(int u = 0; u<dpSmall.length; u++)
+						{
+							magD += (dpSmall[u])*(dpSmall[u]);
+						}
+						magD = Math.sqrt(magD);
+					}
+					
+					
+					/// [count] vs [k]
+					int bestNode = 0;
+					double bestNodeMag = 0;
+					double[] bestNodeSmall = new double[nodeSmall.length];
+					for(int j = 0; j < nodeNum; j++) 					//Each data point goes through each Node looking for most similar
+					{
+						int county = 0;
+						for(int k = 0; k < dpSize; k++)
+						{
+							if(chr != dpChr[k])
+							{
+								//System.out.println(dpChr[j]+ "\t" + chr + "\t" + county + "\t" + nodes[j][k]);
+								nodeSmall[county] = nodes[j][k];
+								county++;
+							} 
+						}
+
+						double magN  = 0;
+						if(cos)
+						{
+							for(int u = 0; u<nodeSmall.length; u++)
+							{
+								magN += (nodeSmall[u])*(nodeSmall[u]);
+							}
+							magN = Math.sqrt(magN);
+						}
+						
+						double dist = 0;
+						if(cos)
+							dist = cosineSim(nodeSmall, dpSmall, magN, magD);
+						else
+							dist = pearson(nodeSmall, dpSmall);
+						
+						if(dist>initdist)  								//Node with highest cosine similarity value to data point = most similar
+						{
+							//System.out.println(dist);
+							initdist = dist;
+							bestNode = j;
+						}
+					}
+					if(initdist <= 0)
+					{
+						System.out.println("fugg :^)");
+					}
+					//System.out.println(bestNode);
+					pAssign[i-threadLims[thisT][0]][bestNode] = true;
+					pp[bestNode]++;
+				}
 			}
 		}
 	}
@@ -160,10 +240,6 @@ public class ThreadMap
 		initialize();
 		iterater();
 		finishTraining();
-		//timerElse = (System.currentTimeMillis() - init) - timerIterate - timerAssign;
-		//double timeTot = timerElse + timerIterate + timerAssign;
-		//System.out.println("% Iteration = " + timerIterate/timeTot + "    % Assignment = " + timerAssign/timeTot + "    % other stuff = " + timerElse/timeTot);
-		//System.out.println("Iteration = " + timerIterate + "    % Assignment = " + timerAssign + "    % other stuff = " + timerElse);
 	}
 	
 	//Reader class used to generate data points from file 
@@ -171,6 +247,7 @@ public class ThreadMap
 	{
 		reader.matrixReader(); 									//reader object and file location set in constructor
 		ArrayList<DataPoint> points = reader.points;
+		
 		ArrayList<DataPoint> badPoints = new ArrayList<DataPoint>();
 		
 		for(int i = 0; i< points.size(); i++)
@@ -189,24 +266,39 @@ public class ThreadMap
 		
 		points.removeAll(badPoints);
 		
+		
 		int newSize = points.size();
-		for(int i = 0; i< points.size(); i++)
+		if(badPoints.size()>0)
 		{
-			points.get(i).removeDuds(newSize, locations);
+			for(int i = 0; i< points.size(); i++)
+			{
+				points.get(i).removeDuds(newSize, locations);
+			}
 		}
 		
 		dpSize = points.size();
 		dpNames = new String[dpSize];
+		dpChr = new int[dpSize];
 		dpMag = new double[dpSize];
 		dp = new double[dpSize][dpSize];
-		
+		chrCount = 0;
 		for(int i = 0; i< dpSize; i++)
 		{
-			dpNames[i] = points.get(i).name;
+			String sss = points.get(i).name; 
+			dpNames[i] = sss;
+			dpChr[i] = Integer.parseInt(sss.substring(sss.indexOf("chr")+3,sss.indexOf(":")));
+			if(dpChr[i]>chrCount)
+				chrCount = dpChr[i];
+			dpPerChr = new int[chrCount];
+			//System.out.println(dpChr[i]);
 			dpMag[i] = points.get(i).updateMag();
 			if(dpMag[i]==0)
 				System.out.println("d  "+dpMag[i]);
 			dp[i] = points.get(i).g;
+		}
+		for(int i = 0; i < dpSize; i++)
+		{
+			dpPerChr[dpChr[i]-1]++;
 		}
 	}
 	
@@ -325,6 +417,30 @@ public class ThreadMap
 	    	System.out.println("whoops");
 		return dot;
 	}
+	public double cosineSim(double[] nodal, double[] datal, double magNode, double magData)
+	{
+		double dot = 0;
+		double magN = magNode;
+		double magD = magData;
+		for(int i = 0; i < nodal.length; i++)
+		{
+			dot += (nodal[i]) * (datal[i]);
+		}
+		dot = dot/(magN*magD);
+		if(Double.isNaN(magN))
+		{
+			System.out.println("NaN  "+ magN + "   " + magD);
+			dot = 0;
+		}
+		//System.out.println(dot);
+		if(dot > 1 && dot< 1.0000001)
+	    	dot=1;
+	    if(dot>1.0000001)
+	    	System.out.println("whoops");
+		return dot;
+	}
+	
+	
 	public double pearson(int iNode, int jDP)
 	{
 		double sx = 0.0;
@@ -338,6 +454,44 @@ public class ThreadMap
 	    {
 	      double x = nodes[iNode][i];
 	      double y = dp[jDP][i];
+
+	      sx += x;
+	      sy += y;
+	      sxx += x * x;
+	      syy += y * y;
+	      sxy += x * y;
+	    }
+
+	    // covariation
+	    double cov = sxy / n - sx * sy / n / n;
+	    // standard error of x
+	    double sigmax = Math.sqrt(sxx / n -  sx * sx / n / n);
+	    // standard error of y
+	    double sigmay = Math.sqrt(syy / n -  sy * sy / n / n);
+
+	    // correlation is just a normalized covariation
+	    
+	    double rr = cov / sigmax / sigmay;
+	    if(rr > 1 && rr< 1.0000001)
+	    	rr=1;
+	    if(rr>1.0000001)
+	    	System.out.println("whoops");
+	    return rr;
+	}
+	
+	public double pearson(double[] nodal, double[] datal)
+	{
+		double sx = 0.0;
+	    double sy = 0.0;
+	    double sxx = 0.0;
+	    double syy = 0.0;
+	    double sxy = 0.0;
+
+	    int n = nodal.length;
+	    for(int i = 0; i < n; i++) 
+	    {
+	      double x = nodal[i];
+	      double y = datal[i];
 
 	      sx += x;
 	      sy += y;
@@ -379,6 +533,21 @@ public class ThreadMap
 		}
 	}
 	
+	public int nFactorSize()
+	{
+		int i = 0;
+		double sig = sgm;
+		double lr = 1;
+		double r = 1;
+		while(r > zero)
+		{
+			r = lr*Math.exp(-1*((i*i)/(2*sig*sig)));
+			if(r>zero)
+				i++;
+		}
+		//System.out.println(i);
+		return i;
+	}
 	//Finds the weight factor of a given data point based on learning rate and neighborhood function
 	public void nFactor(double itercount) 
 	{   
@@ -445,7 +614,8 @@ public class ThreadMap
 				neighborly[j][i] = neighborly[i][j];
 			}
 		}
-		weightsByHood = new double[farthestNeighbor+1];
+		maxDist = Math.min(nFactorSize(), farthestNeighbor);
+		weightsByHood = new double[maxDist];
 	}
 	
 	//Called by go() after iterations are complete
@@ -631,7 +801,7 @@ public class ThreadMap
 		BufferedWriter b;
 		try 
 		{
-			String g = lander + " SOM ("+xNodes+"x"+yNodes+"), "+(int)sgm+  "-"+sgmStop +", " + iterations + ", " + sampleSize + ", " + ((double)((int)(cosineQuality*10000))/10000)+ ", "+((double)((int)(pearsonQuality*10000))/10000)+ ", "+ ((double)((int)(stability*10000))/10000) + ", " + percentUnoccupied() + ".txt";
+			String g = lander + " SOM ("+xNodes+"x"+yNodes+"), "+sgm+  "-"+sgmStop +", " + iterations + ", " + sampleSize + ", " + ((double)((int)(cosineQuality*10000))/10000)+ ", "+((double)((int)(pearsonQuality*10000))/10000)+ ", "+ ((double)((int)(stability*10000))/10000) + ", " + percentUnoccupied() + ".txt";
 			System.out.println(g);
 			int counter = 0;
 			for(int i = 0; i < dpcount.length ; i++)
