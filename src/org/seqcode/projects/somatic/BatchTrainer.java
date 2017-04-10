@@ -20,6 +20,7 @@ public class BatchTrainer extends JFrame
     static BatchTrainer window2;
     int winW, winH;
 	public DrawHex d;
+	public DrawCompartment dd;
 	public UseMap u;
 	private static final long serialVersionUID = 1L;
 	public ArrayList<String> s;
@@ -47,6 +48,15 @@ public class BatchTrainer extends JFrame
 		d.nodeBuild(700,700);
     	//d.colors();
     	d.heatMapping();
+	 }
+	 public void drawComps(String s, String ss)
+	 {
+		 dd = new DrawCompartment(s, ss);
+		 add(dd, BorderLayout.CENTER);
+		 dd.nodeBuild(700,700);
+		 dd.heatMapping();
+		 dd.swap();
+		 dd.repaint();
 	 }
 	 public void drawGrid(String s, int i, int j, boolean boo)
 	 {
@@ -208,6 +218,17 @@ public class BatchTrainer extends JFrame
 	    		String searchFiles = args[2];
 	    		UseMap u = new UseMap(mapFileName, searchFiles, Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1,Integer.parseInt(args[4])==-1 );
 	    		u.searchSystem();
+	    	}
+	    	if(args[0].equalsIgnoreCase("compartments"))
+	    	{
+	    		window2 = new BatchTrainer(700,700, "view");
+	    		String mapFileName = args[1];
+	    		String searchFiles = args[2];
+	    		window2.drawComps(mapFileName, searchFiles);
+	    		window2.setBounds(0,0,700,700);
+	    	    window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    	    window2.setVisible(true);
+	    	    window2.setResizable(true);	
 	    	}
 	    	if(args[0].equalsIgnoreCase("pairwise"))
 	    	{

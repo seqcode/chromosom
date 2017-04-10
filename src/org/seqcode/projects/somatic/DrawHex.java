@@ -139,7 +139,42 @@ public class DrawHex extends JPanel
 			double weight = 0;
 			String[] wholes = whole.split("\t");
 			//System.out.println(equalWeight);
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
+			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+			{
+				if(wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("Y"))
+					chr = 23;
+				else 
+					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
+				String loc1 = wholes[1];
+				locus1 = Integer.parseInt(loc1);
+				locus2 = Integer.parseInt(wholes[2]);
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
+				int locus = locus1;
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				int count = 0;
+				while(locus<locus2)
+				{
+					for(int i = 0; i< dataPoints.size(); i++)
+					{
+						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						{
+							count++;
+							inds.add(i);
+						}
+					}
+					locus+=binSize;
+				}
+				weight/=count;
+				for(Integer i: inds)
+				{
+					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
+					dataPoints.get(i).myMini.weight += weight;
+				}
+			}
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
@@ -200,6 +235,7 @@ public class DrawHex extends JPanel
 				}
 			}
 		}
+		
 		strings.removeAll(strings);
 		strings = inputRead(file2);
 		for(String whole: strings)
@@ -209,7 +245,42 @@ public class DrawHex extends JPanel
 			double weight = 0;
 			String[] wholes = whole.split("\t");
 			
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
+			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+			{
+				if(wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("Y"))
+					chr = 23;
+				else 
+					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
+				String loc1 = wholes[1];
+				locus1 = Integer.parseInt(loc1);
+				locus2 = Integer.parseInt(wholes[2]);
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
+				int locus = locus1;
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				int count = 0;
+				while(locus<locus2)
+				{
+					for(int i = 0; i< dataPoints.size(); i++)
+					{
+						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						{
+							count++;
+							inds.add(i);
+						}
+					}
+					locus+=binSize;
+				}
+				weight/=count;
+				for(Integer i: inds)
+				{
+					dataPoints.get(i).myMini.blueCounting.add(dataPoints.get(i));
+					dataPoints.get(i).myMini.blueWeight += weight;
+				}
+			}
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
@@ -293,7 +364,42 @@ public class DrawHex extends JPanel
 			double weight = 0;
 			String[] wholes = whole.split("\t");
 			//System.out.println(whole);
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
+			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+			{
+				if(wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("Y"))
+					chr = 23;
+				else 
+					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
+				String loc1 = wholes[1];
+				locus1 = Integer.parseInt(loc1);
+				locus2 = Integer.parseInt(wholes[2]);
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
+				int locus = locus1;
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				int count = 0;
+				while(locus<locus2)
+				{
+					for(int i = 0; i< dataPoints.size(); i++)
+					{
+						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						{
+							count++;
+							inds.add(i);
+						}
+					}
+					locus+=binSize;
+				}
+				weight/=count;
+				for(Integer i: inds)
+				{
+					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
+					dataPoints.get(i).myMini.weight += weight;
+				}
+			}
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
@@ -376,7 +482,42 @@ public class DrawHex extends JPanel
 			double weight = 0;
 			String[] wholes = whole.split("\t");
 			//System.out.println(whole);
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
+			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+			{
+				if(wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("Y"))
+					chr = 23;
+				else 
+					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
+				String loc1 = wholes[1];
+				locus1 = Integer.parseInt(loc1);
+				locus2 = Integer.parseInt(wholes[2]);
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
+				int locus = locus1;
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				int count = 0;
+				while(locus<locus2)
+				{
+					for(int i = 0; i< dataPoints.size(); i++)
+					{
+						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						{
+							count++;
+							inds.add(i);
+						}
+					}
+					locus+=binSize;
+				}
+				weight/=count;
+				for(Integer i: inds)
+				{
+					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
+					dataPoints.get(i).myMini.weight += weight;
+				}
+			}
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))

@@ -54,7 +54,7 @@ public class UseMap
 
 		for (File file : listOfFiles) 
 		{
-		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1)) 
+		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1 || file.getName().indexOf(".peaks")!=-1 || file.getName().indexOf(".narrowpeaks")!=-1)) 
 		    {
 		    	searchers.add(file.getName());
 		    }
@@ -132,6 +132,7 @@ public class UseMap
 	{
 		if(pics)
 		{
+			d.equalWeight = (weightCol == -1);
 			d.search(fold+"/"+file, locCol, weightCol);
 			d.repaint();
 			d.saveImg(file, der, 700, 700);
@@ -149,7 +150,54 @@ public class UseMap
 			int chr = 0;
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
+			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_") )
+			{
+				if(wholes[0].substring(wholes[0].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[0].substring(whole.indexOf("chr")+3).equalsIgnoreCase("Y"))
+					chr = 23;
+				else 
+					chr  = Integer.parseInt(wholes[0].substring(whole.indexOf("chr")+3));
+				String loc1 = wholes[1];
+				locus1 = Integer.parseInt(loc1);
+				locus2 = Integer.parseInt(wholes[2]);
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
+				int locus = locus1;
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				int count = 0;
+				while(locus<locus2)
+				{
+					for(int i = 0; i< bins.size(); i++)
+					{
+						if(bins.get(i).chrome == chr && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
+						{
+							
+							count++;
+							inds.add(i);
+						}
+					}
+					locus+=binSize;
+				}
+				if(showPVal)
+				{
+					for(int p = 1; p<g[0].length; p++)
+					{
+						int ree = (int) (Math.random()*bins.size());
+						ree = nodeList.indexOf(bins.get(ree).myMini);
+						g[ree][p] += weight;
+					}
+				}
+				weight/=count;
+				for(Integer i: inds)
+				{
+					bins.get(i).myMini.counting.add(bins.get(i));
+					bins.get(i).myMini.weight += weight;
+					g[nodeList.indexOf(bins.get(i).myMini)][0] += weight;
+					//System.out.println(weight);
+				}
+			}
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
 			{
 				weighting = true;
 				if(wholes[locCol].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[locCol].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
