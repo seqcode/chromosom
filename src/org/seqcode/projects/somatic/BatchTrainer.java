@@ -53,7 +53,7 @@ public class BatchTrainer extends JFrame
 	 {
 		 dd = new DrawCompartment(s, ss);
 		 add(dd, BorderLayout.CENTER);
-		 dd.nodeBuild(700,700);
+		 dd.nodeBuild(750,750);
 		 dd.heatMapping();
 		 dd.swap();
 		 dd.repaint();
@@ -221,7 +221,7 @@ public class BatchTrainer extends JFrame
 	    	}
 	    	if(args[0].equalsIgnoreCase("compartments"))
 	    	{
-	    		window2 = new BatchTrainer(700,700, "view");
+	    		window2 = new BatchTrainer(750,750, "view");
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
 	    		window2.drawComps(mapFileName, searchFiles);

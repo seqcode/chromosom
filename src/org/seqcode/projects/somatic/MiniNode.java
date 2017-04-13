@@ -13,7 +13,7 @@ public class MiniNode
 	public ArrayList<DataPoint> counting;
 	public ArrayList<DataPoint> blueCounting;
 	public ArrayList<DataPoint> notCounting;
-	public Color color;
+	public Color color,outline;
 	public double weight, blueWeight;
 	MiniNode(String s)
 	{

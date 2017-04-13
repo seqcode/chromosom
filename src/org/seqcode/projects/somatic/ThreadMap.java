@@ -852,6 +852,35 @@ public class ThreadMap
 			e.printStackTrace();
 			System.out.print("no way");
 		}
+		
+		
+		try 
+		{
+			String g = lander+ "_Node_Vectors.txt";
+			System.out.println(g);
+			
+			FileWriter ff = new FileWriter(g,true);
+			b = new BufferedWriter(ff);
+			PrintWriter printer = new PrintWriter(b);
+			
+			for(int i = 0; i < nodes.length; i++)
+			{
+				int x = i%xNodes;
+				int y = i/yNodes;
+				printer.print("("+ x+","+y +")\t");
+				for(int j = 0; j < nodes[i].length-1; j++)
+				{
+					printer.print(nodes[i][j]+"\t");
+				}
+				printer.print(nodes[i][nodes[i].length-1]+"\n");
+			}
+			printer.close();
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			System.out.print("no way");
+		}
 	}
 }
 

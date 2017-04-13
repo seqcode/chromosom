@@ -1,4 +1,5 @@
 package org.seqcode.projects.somatic;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -43,7 +44,7 @@ public class DrawCompartment extends JPanel
 	public String fold, mapper, der;
 	public int maxBins, minBins, pValnVal, locCol, weightCol;
 	public ArrayList<DataPoint> bins;
-	public ArrayList<String> searchers;
+	public ArrayList<String> searchers,compNames;
 	public double[][] compCount;
 	public DrawCompartment(String s, String ss)
 	{
@@ -70,7 +71,8 @@ public class DrawCompartment extends JPanel
     	String mapp = System.getProperty("user.dir")+"/"+map;
     	
     	searchers = new ArrayList<String>();
-		mapReader(mapp);
+    	compNames = new ArrayList<String>();
+    	mapReader(mapp);
 		File folder = new File(System.getProperty("user.dir")+"/"+directory);
 		File[] listOfFiles = folder.listFiles();
 
@@ -79,6 +81,7 @@ public class DrawCompartment extends JPanel
 		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1)) 
 		    {
 		    	searchers.add(file.getPath());
+		    	compNames.add(file.getName());
 		    }
 		}
 		compCount = new double[nodes][searchers.size()];
@@ -378,69 +381,29 @@ public class DrawCompartment extends JPanel
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
 	    	g.setColor(nodeList.get(i).color);
-	    	
-	    	
-//		 	//For determining if neighbor Distance is working	    	
-//	    	if(i == centerNode)
-//	    	{
-//		    	int xCoordA = i%xNodes;
-//				int yCoordA = i/yNodes;
-//				
-//				for (int j = 0; j<nodeList.size(); j++)
-//				{
-//					int xCoordB = j%xNodes;
-//					int yCoordB = j/yNodes;
-//					
-//					double ddd = hexDist(xCoordA, yCoordA, xCoordB, yCoordB);
-//
-//					if(ddd == 0)
-//						nodeList.get(j).color = Color.BLACK;
-//					if(ddd == 1)
-//						nodeList.get(j).color = Color.BLUE;
-//					if(ddd == 2)
-//						nodeList.get(j).color = Color.GREEN;
-//					if(ddd == 3)
-//						nodeList.get(j).color = Color.RED;
-//					if(ddd == 4)
-//						nodeList.get(j).color = Color.BLUE;
-//					if(ddd == 5)
-//						nodeList.get(j).color = Color.GREEN;
-//					if(ddd == 6)
-//						nodeList.get(j).color = Color.RED;
-//					if(ddd == 7)
-//						nodeList.get(j).color = Color.BLUE;
-//					if(ddd == 8)
-//						nodeList.get(j).color = Color.GREEN;
-//					if(ddd == 9)
-//						nodeList.get(j).color = Color.RED;
-//					if(ddd == 10)
-//						nodeList.get(j).color = Color.BLUE;
-//					if(ddd == 11)
-//						nodeList.get(j).color = Color.GREEN;
-//					if(ddd == 12)
-//						nodeList.get(j).color = Color.RED;
-//				}
-//	    	}
-	    	
-	    	
 	    	g.fillPolygon(nodeList.get(i).p);
-	    	if(swap==2||swap ==3)
-	    	{
-	    		g.setColor(Color.BLACK);
-		    	g.setFont(new Font("Serif", 5, 9));
-		    	g.drawString(""+nodeList.get(i).counting.size(),nodeList.get(i).xLoc-4, nodeList.get(i).yLoc+5);
-		    	g.drawPolygon(nodeList.get(i).p);
-	    	}
+//	    	Graphics2D g2 = (Graphics2D) g;
+//	        g2.setStroke(new BasicStroke(2));
+	    	g.setColor(nodeList.get(i).outline);
+		    g.drawPolygon(nodeList.get(i).p);
 	    }
-	    g.setColor(Color.BLACK);
-    	g.setFont(new Font("Serif", 5, 9));
-    	g.drawString("Gini = "+gini, getWidth()-200, 15);
+	    for(int i = 0; i<colors.size(); i++)
+	    {
+	    	g.setColor(colors.get(i));
+	    	int xCenter = (i*50)+50;
+	    	int xLabel = (i*50)+57;
+	    	int yCenter = 650;
+	    	g.fillRect(xCenter-5, yCenter-5, 10, 10);
+	    	g.setColor(Color.BLACK);
+	    	g.setFont(new Font("Serif", 5, 9));
+	    	g.drawString(compNames.get(i), xLabel, yCenter+4);
+	    }
     	//g.drawString("Sep = "+ sep, getWidth()-400, 15);
 	}
 	public void nodeBuild(int winW, int winH)
 	{  
-		int xMin = (int)(.1 * winW);
-	    int yMin = (int)(.05 * winH);
+		int xMin = (int)(.025 * winW);
+	    int yMin = (int)(.025 * winH);
 	    int xMax = (int)(.90 * winW);
 	    int yMax = (int)(.85 * winH);
 		
@@ -475,22 +438,22 @@ public class DrawCompartment extends JPanel
 		  int[] yPoints = new int[6];
 		  
 		  xPoints[0] = m.xLoc;
-		  yPoints[0] = m.yLoc-(2*y);
+		  yPoints[0] = m.yLoc-(2*y)+1;
 		  
-		  xPoints[1] = m.xLoc+x;
-		  yPoints[1] = m.yLoc-y;
+		  xPoints[1] = m.xLoc+x-1;
+		  yPoints[1] = m.yLoc-y+1;
 		  
-		  xPoints[2] = m.xLoc+x;
-		  yPoints[2] = m.yLoc+y;
+		  xPoints[2] = m.xLoc+x-1;
+		  yPoints[2] = m.yLoc+y-1;
 			
 		  xPoints[3] = m.xLoc;
-		  yPoints[3] = m.yLoc+(2*y);
+		  yPoints[3] = m.yLoc+(2*y)-1;
 
-		  xPoints[4] = m.xLoc-x;
-		  yPoints[4] = m.yLoc+y;
+		  xPoints[4] = m.xLoc-x+1;
+		  yPoints[4] = m.yLoc+y-1;
 			
-		  xPoints[5] = m.xLoc-x;
-		  yPoints[5] = m.yLoc-y;
+		  xPoints[5] = m.xLoc-x+1;
+		  yPoints[5] = m.yLoc-y+1;
 		  
 		  m.polygonMaker(xPoints, yPoints, 6);
 	   }
@@ -631,10 +594,11 @@ public class DrawCompartment extends JPanel
 //	}
 	public void heatMapping()
 	{
-		ArrayList<Color> colors = new ArrayList<Color>();
-		colors.add(Color.GREEN);colors.add(Color.YELLOW);colors.add(Color.BLUE);
-		colors.add(Color.CYAN);colors.add(Color.RED);colors.add(Color.MAGENTA);colors.add(Color.GRAY);
-		
+		if(colors.size()<7)
+		{
+			colors.add(Color.GREEN);colors.add(Color.YELLOW);colors.add(Color.BLUE);
+			colors.add(Color.CYAN);colors.add(Color.RED);colors.add(Color.MAGENTA);colors.add(Color.GRAY);
+		}
 //		colors.add(Color.RED);colors.add(Color.RED);colors.add(Color.BLUE);
 //		colors.add(Color.BLUE);colors.add(Color.BLUE);colors.add(Color.BLUE); colors.add(Color.WHITE);
 		
@@ -645,19 +609,35 @@ public class DrawCompartment extends JPanel
 //			int B= (int)(Math.random()*256);
 //			colors.add(new Color(R, G, B));
 //		}
+		double[] largest = new double[compCount[0].length];
+		for(int i = 0; i < nodeSystem.size(); i++)
+		{
+			for(int j = 0; j < compCount[i].length; j++)
+			{
+				if(compCount[i][j]>largest[j])
+					largest[j] = compCount[i][j];
+			}
+		}
 		for(int i = 0; i<nodeSystem.size(); i++)
 		{
 			double best = 0;
 			int colorInd = 0;
 			for(int j = 0; j < compCount[i].length; j++)
 			{
-				if(compCount[i][j]>best)
+				if(compCount[i][j]/largest[j]>best/largest[j])
 				{
 					best = compCount[i][j];
 					colorInd = j;
 				}
-				if(best > 0)
-					nodeSystem.get(i).color = colors.get(colorInd);
+				if(best > 0 )
+				{
+					double ratio = best/largest[colorInd];
+					int R = (int) ((colors.get(colorInd).getRed()*ratio) + (Color.WHITE.getRed()*(1-ratio)));
+					int G = (int) ((colors.get(colorInd).getGreen()*ratio) + (Color.WHITE.getGreen()*(1-ratio)));
+					int B = (int) ((colors.get(colorInd).getBlue()*ratio) + (Color.WHITE.getBlue()*(1-ratio)));
+					nodeSystem.get(i).color = new Color(R,G,B);//colors.get(colorInd);
+					nodeSystem.get(i).outline = colors.get(colorInd);
+				}
 				else
 					nodeSystem.get(i).color = Color.GRAY;
 			}
