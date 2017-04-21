@@ -230,6 +230,17 @@ public class BatchTrainer extends JFrame
 	    	    window2.setVisible(true);
 	    	    window2.setResizable(true);	
 	    	}
+	    	if(args[0].equalsIgnoreCase("cor"))
+	    	{
+	    		String map = args[1];
+	    		ArrayList<String> folders = new ArrayList<String>();
+	    		for(int i = 2; i<args.length; i++)
+	    		{
+	    			folders.add(args[i]);
+	    		}
+	    		Correlations c = new Correlations(map, folders);
+	    		c.searchSystem();
+	    	}
 	    	if(args[0].equalsIgnoreCase("pairwise"))
 	    	{
 	    		String mapFileName = args[1];
