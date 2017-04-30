@@ -1,4 +1,5 @@
 package org.seqcode.projects.somatic;
+import java.awt.AWTException;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -133,14 +135,18 @@ public class DrawCompartment extends JPanel
 	
 	public void saveImg(String name, String file, int w, int h)
 	{
-	    BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D gg = bi.createGraphics();
-	    gg.setClip(100, 100, 300, 300);
-	    print((Graphics) gg.getClip());
+		BufferedImage image = null;
+		try {
+			image = new Robot().createScreenCapture(new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, 10, 10));
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		}
+	    Graphics2D gg = image.createGraphics();
+	    print(gg);
 	    try 
 	    {
 	        File outputfile = new File(file+"/"+name+".png");
-	        ImageIO.write(bi, "png", outputfile);
+	        ImageIO.write(image, "png", outputfile);
 	    } catch (IOException e) {}
 	}
 	

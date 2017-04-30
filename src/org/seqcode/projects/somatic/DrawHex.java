@@ -1,10 +1,13 @@
 package org.seqcode.projects.somatic;
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,6 +84,20 @@ public class DrawHex extends JPanel
     	www = weightLoc;
     	equalWeight = equalW;
     	//System.out.println(binSize);
+	}
+	public void saveImg(String name, String file)
+	{
+		BufferedImage image = null;
+		try {
+			image = new Robot().createScreenCapture(new Rectangle(this.getLocationOnScreen().x+62, this.getLocationOnScreen().y+30, 511, 457));
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		}
+	    try 
+	    {
+	        File outputfile = new File(file+"/"+name+".png");
+	        ImageIO.write(image, "png", outputfile);
+	    } catch (IOException e) {}
 	}
 	public void saveImg(String name, String file, int w, int h)
 	{
@@ -772,7 +789,6 @@ public class DrawHex extends JPanel
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
 	    	g.setColor(nodeList.get(i).color);
-	    	
 	    	
 //		 	//For determining if neighbor Distance is working	    	
 //	    	if(i == centerNode)

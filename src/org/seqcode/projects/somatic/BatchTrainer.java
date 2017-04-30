@@ -102,7 +102,7 @@ public class BatchTrainer extends JFrame
 	    	 
             public void actionPerformed(ActionEvent e)
             {
-                d.saveImg(texter.getText(),System.getProperty("user.dir"),700,700);
+                d.saveImg(texter.getText(),System.getProperty("user.dir"));
             }
         });
 	    search.addActionListener(new ActionListener() {
