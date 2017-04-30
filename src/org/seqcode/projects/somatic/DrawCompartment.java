@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,7 +37,7 @@ public class DrawCompartment extends JPanel
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<Color> colors;
 	MiniSystem nodeSystem;
-	public boolean multi, weighting, norm, equalWeight;
+	public boolean nodeCallsOnly, multi, weighting, norm, equalWeight;
 	int swap, col, www;
 	public double sep, cutoff;
 	String map, directory;
@@ -46,8 +47,9 @@ public class DrawCompartment extends JPanel
 	public ArrayList<DataPoint> bins;
 	public ArrayList<String> searchers,compNames;
 	public double[][] compCount;
-	public DrawCompartment(String s, String ss)
+	public DrawCompartment(String s, String ss, boolean filesContainNodes)
 	{
+		nodeCallsOnly = filesContainNodes;
 		map = s;
 		directory = ss;
 		cutoff = 0.01;
@@ -84,28 +86,64 @@ public class DrawCompartment extends JPanel
 		    	compNames.add(file.getName());
 		    }
 		}
-		compCount = new double[nodes][searchers.size()];
 		nodes = yNodes*xNodes;
-		for(int i = 0; i < searchers.size(); i++)
+		if(!filesContainNodes)
 		{
-			search(searchers.get(i), i);
-			System.out.println(searchers.get(i));
+			compCount = new double[nodes][searchers.size()];
+			for(int i = 0; i < searchers.size(); i++)
+			{
+				search(searchers.get(i), i);
+				System.out.println(searchers.get(i));
+			}
+		}
+		else
+		{
+			colors = new ArrayList<Color>();
+			for(int i = 0; i <nodeList.size(); i++)
+			{
+				nodeList.get(i).color = Color.DARK_GRAY;
+			}
+			for(int i = 0; i < searchers.size(); i++)
+			{
+				colors.add(new Color((int)(255*Math.random()),(int)(255*Math.random()),(int)(255*Math.random())));
+				searchNodes(searchers.get(i),i);
+			}
 		}
     	//System.out.println(binSize);
 	}
+	public void searchNodes(String s, int ind)
+	{
+		ArrayList<String> strings = inputRead(s);
+		for(String whole: strings)
+		{
+			String[] wholes = whole.split("\n");
+			for(String node:wholes)
+			{
+				if(node.contains("(")&&node.contains(","))
+				{
+					String strr = node.substring(node.indexOf("(")+1,node.indexOf(","));
+					String strr2 = node.substring(node.indexOf(",")+1,node.indexOf(")"));
+					int x = Integer.parseInt(strr);
+					int y = Integer.parseInt(strr2);
+					nodeSystem.get(x,y).color = colors.get(ind);
+				}
+			}
+		}
+	}
+	
 	public void saveImg(String name, String file, int w, int h)
 	{
-		this.setVisible(true);
-		this.setSize(w, h);;
 	    BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D g = bi.createGraphics();
-	    print(g);
+	    Graphics2D gg = bi.createGraphics();
+	    gg.setClip(100, 100, 300, 300);
+	    print((Graphics) gg.getClip());
 	    try 
 	    {
 	        File outputfile = new File(file+"/"+name+".png");
 	        ImageIO.write(bi, "png", outputfile);
 	    } catch (IOException e) {}
 	}
+	
 	public void mapReader(String f)
 	{
 		ArrayList<String> StringMat = new ArrayList<String>();
@@ -594,6 +632,8 @@ public class DrawCompartment extends JPanel
 //	}
 	public void heatMapping()
 	{
+		if(nodeCallsOnly)
+			return;
 		if(colors.size()<7)
 		{
 			colors.add(Color.GREEN);colors.add(Color.YELLOW);colors.add(Color.BLUE);

@@ -1,5 +1,6 @@
 package org.seqcode.projects.somatic;
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,9 +50,9 @@ public class BatchTrainer extends JFrame
     	//d.colors();
     	d.heatMapping();
 	 }
-	 public void drawComps(String s, String ss)
+	 public void drawComps(String s, String ss, boolean nodes)
 	 {
-		 dd = new DrawCompartment(s, ss);
+		 dd = new DrawCompartment(s, ss, nodes);
 		 add(dd, BorderLayout.CENTER);
 		 dd.nodeBuild(750,750);
 		 dd.heatMapping();
@@ -69,6 +70,8 @@ public class BatchTrainer extends JFrame
 	 //Finds and shows chromes
 	 public void setUpMenu(JMenuBar menubar)
 	 {
+		 JButton save = new JButton("Save");
+	     menubar.add(save);
 		 JButton search = new JButton("Search");
 	     menubar.add(search);
 	     JButton search2 = new JButton("Search 2");
@@ -94,7 +97,14 @@ public class BatchTrainer extends JFrame
                 }catch (NumberFormatException u){chr = 0;}
                 d.countingDPS(chr);
             }
-        });  
+        });
+	    save.addActionListener(new ActionListener() {
+	    	 
+            public void actionPerformed(ActionEvent e)
+            {
+                d.saveImg(texter.getText(),System.getProperty("user.dir"),700,700);
+            }
+        });
 	    search.addActionListener(new ActionListener() {
 	    	 
             public void actionPerformed(ActionEvent e)
@@ -224,7 +234,7 @@ public class BatchTrainer extends JFrame
 	    		window2 = new BatchTrainer(750,750, "view");
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
-	    		window2.drawComps(mapFileName, searchFiles);
+	    		window2.drawComps(mapFileName, searchFiles, args[3]!=null &&args[3].contains("nodes"));
 	    		window2.setBounds(0,0,700,700);
 	    	    window2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    	    window2.setVisible(true);

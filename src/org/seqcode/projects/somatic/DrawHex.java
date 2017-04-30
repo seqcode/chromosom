@@ -85,7 +85,7 @@ public class DrawHex extends JPanel
 	public void saveImg(String name, String file, int w, int h)
 	{
 		this.setVisible(true);
-		this.setSize(w, h);;
+		this.setSize(w, h);
 	    BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 	    Graphics2D g = bi.createGraphics();
 	    print(g);
@@ -1023,23 +1023,23 @@ public class DrawHex extends JPanel
 //			colors.add(c);
 //		}
 //	}
-	public void colorBar(Graphics g)
-	{
-		g.drawRect((int)(getWidth()*.2), (int)(getHeight()*.96), (int)(getWidth()*.55), (int)(getHeight()*.02));
-		g.setColor(Color.BLACK);
-		g.drawString(""+minDataPoints, (int)(getWidth()*.17),(int)(getHeight()*.95));
-		g.drawString(""+maxDataPoints, (int)(getWidth()*.2+(int)(getWidth()*.55)),(int)(getHeight()*.95));
-		for(int k = 0; k<colorNum;k++)
-		{
-			int red = 255;//(int)(k*255/colorNum);
-			int blue = (int)(255-(k*255/colorNum));
-			int green = (int)(255-(k*255/colorNum));
-			Color c = new Color(red, green, blue);
-			g.setColor(c);
-			g.fillRect((int)(getWidth()*.2+((k*getWidth()*.55)/colorNum)),(int)(getHeight()*.96),(int)(getWidth()*.55/colorNum)+3,(int)(getHeight()*.02));
-		}
-		
-	}
+//	public void colorBar(Graphics g)
+//	{
+//		g.drawRect((int)(getWidth()*.2), (int)(getHeight()*.96), (int)(getWidth()*.55), (int)(getHeight()*.02));
+//		g.setColor(Color.BLACK);
+//		g.drawString(""+minDataPoints, (int)(getWidth()*.17),(int)(getHeight()*.95));
+//		g.drawString(""+maxDataPoints, (int)(getWidth()*.2+(int)(getWidth()*.55)),(int)(getHeight()*.95));
+//		for(int k = 0; k<colorNum;k++)
+//		{
+//			int red = 255;//(int)(k*255/colorNum);
+//			int blue = (int)(255-(k*255/colorNum));
+//			int green = (int)(255-(k*255/colorNum));
+//			Color c = new Color(red, green, blue);
+//			g.setColor(c);
+//			g.fillRect((int)(getWidth()*.2+((k*getWidth()*.55)/colorNum)),(int)(getHeight()*.96),(int)(getWidth()*.55/colorNum)+3,(int)(getHeight()*.02));
+//		}
+//		
+//	}
 	public void heatMapping()
 	{
 		minDataPoints = 0;
@@ -1122,6 +1122,7 @@ public class DrawHex extends JPanel
 	//both files must be weighted
 	public void multiHeatMapping()
 	{
+		System.out.println(nodeList.size());
 		minDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
 		maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
 		for(int i = 0; i<nodeList.size(); i++)
@@ -1142,18 +1143,19 @@ public class DrawHex extends JPanel
 			if(nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight<minBlueDataPoints)
 				minBlueDataPoints = (int) (nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight);
 		}
-		if(maxBlueDataPoints == minBlueDataPoints) maxBlueDataPoints++;
+		if(maxBlueDataPoints == minBlueDataPoints) 
+			maxBlueDataPoints++;
 		
-		for(int i = 0; i<nodeSystem.size(); i++)
+		for(int i = 0; i<nodeList.size(); i++)
 		{	   
-			MiniNode p = nodeSystem.get(i);
+			MiniNode p = nodeList.get(i);
 			double d = p.counting.size()*p.weight;
 			double bl = p.blueCounting.size()*p.blueWeight;
 			double doop = maxDataPoints;
 			double bloop = maxBlueDataPoints;
 			int red = (int)(255-(bl*255/bloop));
 			int blue = (int)(255-(d*255/doop));
-			int green = 255-((int)((d*127/doop))+(int)((d*128/doop)));
+			int green = 255-((int)((d*127/doop))+(int)((d*127/doop)));
 			
 			p.color = new Color(red, green, blue);
 			if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)

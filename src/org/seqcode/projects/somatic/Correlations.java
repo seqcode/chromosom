@@ -104,6 +104,23 @@ public class Correlations
 	}
 	public double pearson(double[] nodal, double[] datal)
 	{
+		double[] nnn = nodal;
+		double[] ddd = datal;
+		double maxdd = 0;
+		double maxnn = 0;
+		for(int i = 0; i<nodal.length; i++)
+		{
+			if(nodal[i]>maxnn)
+				maxnn = nodal[i];
+		}
+		for(int i = 0; i<datal.length; i++)
+		{
+			if(datal[i]>maxdd)
+				maxdd=datal[i];
+		}
+		for(int i = 0; i<nodal.length; i++) {nodal[i]/=maxnn;}
+		for(int i = 0; i<datal.length; i++) {datal[1]/=maxdd;}
+		
 		double sx = 0.0;
 	    double sy = 0.0;
 	    double sxx = 0.0;
@@ -137,6 +154,8 @@ public class Correlations
 	    	rr=1;
 	    if(rr>1.0000001)
 	    	System.out.println("whoops");
+	    nodal = nnn;
+	    datal = ddd;
 	    return rr;
 	}
 	public void search(String file)
