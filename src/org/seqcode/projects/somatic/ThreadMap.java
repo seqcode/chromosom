@@ -417,6 +417,7 @@ public class ThreadMap
 	}
 	public double cosineSim(double[] nodal, double[] datal, double magNode, double magData)
 	{
+		//System.out.println(nodal.length + "\t" + nodes[0].length + "\t" + datal.length + "\t" + dp[0].length);
 		double dot = 0;
 		double magN = magNode;
 		double magD = magData;

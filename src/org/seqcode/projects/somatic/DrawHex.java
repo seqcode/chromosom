@@ -140,9 +140,9 @@ public class DrawHex extends JPanel
 			search(file1);
 			return;
 		}
-		for(int i = 0; i < nodeSystem.size(); i++)
+		for(int i = 0; i < nodeList.size(); i++)
 		{
-			MiniNode mini = nodeSystem.get(i);
+			MiniNode mini = nodeList.get(i);
 			mini.counting.clear();
 			mini.blueCounting.clear();
 			mini.blueWeight=0;
@@ -155,10 +155,10 @@ public class DrawHex extends JPanel
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
 			String[] wholes = whole.split("\t");
-			//System.out.println(equalWeight);
+			//System.out.println(whole);
 			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
 			{
-				if(wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("Y"))
+				if(wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("Y"))
 					chr = 23;
 				else 
 					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
@@ -191,7 +191,7 @@ public class DrawHex extends JPanel
 					dataPoints.get(i).myMini.weight += weight;
 				}
 			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
@@ -252,7 +252,6 @@ public class DrawHex extends JPanel
 				}
 			}
 		}
-		
 		strings.removeAll(strings);
 		strings = inputRead(file2);
 		for(String whole: strings)
@@ -261,10 +260,10 @@ public class DrawHex extends JPanel
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
 			String[] wholes = whole.split("\t");
-			
+			//System.out.println(whole);
 			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
 			{
-				if(wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3).equalsIgnoreCase("Y"))
+				if(wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("Y"))
 					chr = 23;
 				else 
 					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
@@ -297,7 +296,7 @@ public class DrawHex extends JPanel
 					dataPoints.get(i).myMini.blueWeight += weight;
 				}
 			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_"))
+			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
 				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
@@ -311,7 +310,6 @@ public class DrawHex extends JPanel
 					weight = 1.0;
 				else
 					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				//System.out.println(weight);
 				for(int i = 0; i< dataPoints.size(); i++)
 				{
 					if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
@@ -788,8 +786,6 @@ public class DrawHex extends JPanel
 //	    System.out.println(centerNode);
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
-	    	g.setColor(nodeList.get(i).color);
-	    	
 //		 	//For determining if neighbor Distance is working	    	
 //	    	if(i == centerNode)
 //	    	{
@@ -826,14 +822,23 @@ public class DrawHex extends JPanel
 //					if(ddd == 10)
 //						nodeList.get(j).color = Color.BLUE;
 //					if(ddd == 11)
-//						nodeList.get(j).color = Color.GREEN;
+//						nodeList.`get(j).color = Color.GREEN;
 //					if(ddd == 12)
 //						nodeList.get(j).color = Color.RED;
 //				}
 //	    	}
-	    	
-	    	
+
+	    	g.setColor(Color.WHITE);
 	    	g.fillPolygon(nodeList.get(i).p);
+	    	if(multi)
+	    	{
+	    		g.setColor(nodeList.get(i).color2);
+	    		g.fillPolygon(nodeList.get(i).p);	
+	    		//nodeList.get(i).color2 = null;
+	    	}
+    		g.setColor(nodeList.get(i).color);
+	    	g.fillPolygon(nodeList.get(i).p);
+	    	
 	    	if(swap==2||swap ==3)
 	    	{
 	    		g.setColor(Color.BLACK);
@@ -1107,7 +1112,7 @@ public class DrawHex extends JPanel
 				MiniNode p = nodeSystem.get(i);
 				double d = p.counting.size()*p.weight;
 				double doop = maxDataPoints;
-				p.color = new Color(255, (int)(255-(d*255/doop)),(int)(255-d*255/doop));
+				p.color = new Color(255, 0,0,(int)(255*d/doop));
 				if((swap == 1||swap == 3)&& p.counting.size()*p.weight<=cutoff*maxDataPoints)
 					p.color = Color.GRAY;
 			}
@@ -1129,7 +1134,7 @@ public class DrawHex extends JPanel
 				MiniNode p = nodeSystem.get(i);
 				double d = p.counting.size();
 				double doop = maxDataPoints;
-				p.color = new Color(255, (int)(255-(d*255/doop)),(int)(255-d*255/doop));
+				p.color = new Color(255, 0,0,(int)(255*d/doop));
 				if((swap == 1||swap == 3) && p.counting.size()==0)
 					p.color = Color.GRAY;
 			}
@@ -1138,44 +1143,74 @@ public class DrawHex extends JPanel
 	//both files must be weighted
 	public void multiHeatMapping()
 	{
-		System.out.println(nodeList.size());
-		minDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
-		maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
-		for(int i = 0; i<nodeList.size(); i++)
+		if(weighting == true && equalWeight==false)
 		{
-			if(nodeList.get(i).counting.size()* nodeList.get(i).weight>maxDataPoints)
-				maxDataPoints = (int) (nodeList.get(i).counting.size() * nodeList.get(i).weight);
-			if(nodeList.get(i).counting.size()* nodeList.get(i).weight<minDataPoints)
-				minDataPoints = (int) (nodeList.get(i).counting.size()* nodeList.get(i).weight);
-		}
-		if(maxDataPoints == minDataPoints) maxDataPoints++;
-		
-		int minBlueDataPoints = (int) (nodeList.get(0).blueCounting.size() * nodeList.get(0).blueWeight);
-		int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size() * nodeList.get(0).blueWeight);
-		for(int i = 0; i<nodeList.size(); i++)
-		{
-			if(nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight>maxBlueDataPoints)
-				maxBlueDataPoints = (int) (nodeList.get(i).blueCounting.size() * nodeList.get(i).blueWeight);
-			if(nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight<minBlueDataPoints)
-				minBlueDataPoints = (int) (nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight);
-		}
-		if(maxBlueDataPoints == minBlueDataPoints) 
-			maxBlueDataPoints++;
-		
-		for(int i = 0; i<nodeList.size(); i++)
-		{	   
-			MiniNode p = nodeList.get(i);
-			double d = p.counting.size()*p.weight;
-			double bl = p.blueCounting.size()*p.blueWeight;
-			double doop = maxDataPoints;
-			double bloop = maxBlueDataPoints;
-			int red = (int)(255-(bl*255/bloop));
-			int blue = (int)(255-(d*255/doop));
-			int green = 255-((int)((d*127/doop))+(int)((d*127/doop)));
+
+			System.out.println(nodeList.size());
+			maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
+			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size() * nodeList.get(0).blueWeight);
+			int maxTot = 0;
+			for(int i = 0; i<nodeList.size(); i++)
+			{
+				if(nodeList.get(i).counting.size()* nodeList.get(i).weight>maxDataPoints)
+					maxDataPoints = (int) (nodeList.get(i).counting.size() * nodeList.get(i).weight);
+				if(nodeList.get(i).blueCounting.size()* nodeList.get(i).blueWeight>maxBlueDataPoints)
+					maxBlueDataPoints = (int) (nodeList.get(i).blueCounting.size() * nodeList.get(i).blueWeight);
+			}
+			for(int i = 0; i<nodeList.size(); i++)
+			{	   
+				MiniNode p = nodeList.get(i);
+				double d = p.counting.size()*p.weight;
+				double bl = p.blueCounting.size()*p.blueWeight;
+				double doop = maxDataPoints;
+				double bloop = maxBlueDataPoints;
+				double ratTot = d + bl;
+				double ratRat = d/ratTot;
+				d/=doop;
+				bl/=bloop;
+				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
+				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
+				//System.out.println(255*redRat*(d/doop) + "\t" + 255*blueRat*(bl/bloop));
+				p.color = new Color(255,0, 0, (int)(255*redRat));
+				p.color2 = new Color(0,0,255,(int)(255*blueRat));
 			
-			p.color = new Color(red, green, blue);
-			if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)
-				p.color = Color.GRAY;
+				if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)
+					p.color = Color.GRAY;
+			}
+		}
+		else
+		{
+			System.out.println(nodeList.size());
+			maxDataPoints = (int) (nodeList.get(0).counting.size());
+			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size());
+			int maxTot = 0;
+			for(int i = 0; i<nodeList.size(); i++)
+			{
+				if(nodeList.get(i).counting.size()>maxDataPoints)
+					maxDataPoints = (int) (nodeList.get(i).counting.size());
+				if(nodeList.get(i).blueCounting.size()>maxBlueDataPoints)
+					maxBlueDataPoints = (int) (nodeList.get(i).blueCounting.size());
+			}
+			for(int i = 0; i<nodeList.size(); i++)
+			{	   
+				MiniNode p = nodeList.get(i);
+				double d = p.counting.size();
+				double bl = p.blueCounting.size();
+				double doop = maxDataPoints;
+				double bloop = maxBlueDataPoints;
+				double ratTot = d + bl;
+				double ratRat = d/ratTot;
+				d/=doop;
+				bl/=bloop;
+				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
+				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
+				//System.out.println(255*redRat*(d/doop) + "\t" + 255*blueRat*(bl/bloop));
+				p.color = new Color(255,0, 0, (int)(255*redRat));
+				p.color2 = new Color(0,0,255,(int)(255*blueRat));
+			
+				if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)
+					p.color = Color.GRAY;
+			}
 		}
 	}
 }

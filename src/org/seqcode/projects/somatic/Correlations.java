@@ -106,20 +106,18 @@ public class Correlations
 	{
 		double[] nnn = nodal;
 		double[] ddd = datal;
-		double maxdd = 0;
-		double maxnn = 0;
+		double totaldd = 0;
+		double totalnn = 0;
 		for(int i = 0; i<nodal.length; i++)
 		{
-			if(nodal[i]>maxnn)
-				maxnn = nodal[i];
+			totalnn += nodal[i];
 		}
 		for(int i = 0; i<datal.length; i++)
 		{
-			if(datal[i]>maxdd)
-				maxdd=datal[i];
+			totaldd+=datal[i];
 		}
-		for(int i = 0; i<nodal.length; i++) {nodal[i]/=maxnn;}
-		for(int i = 0; i<datal.length; i++) {datal[1]/=maxdd;}
+		for(int i = 0; i<nodal.length; i++) {nodal[i]/=totalnn;}
+		for(int i = 0; i<datal.length; i++) {datal[1]/=totaldd;}
 		
 		double sx = 0.0;
 	    double sy = 0.0;

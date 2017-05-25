@@ -432,6 +432,9 @@ public class UseMap
 			int eQTotalWealth = 0;
 			for(int i=0; i<equal.length; i++)
 			{
+
+				if(num==1 && equal[i]>0)
+					System.out.println(i+"\t"+equal[i]);
 				eQTotalWealth += i*equal[i];
 			}
 			
@@ -478,7 +481,9 @@ public class UseMap
 		double uETotalWealth = 0;
 		
 		for(int i1=0; i1<unequal.length; i1++)
-			{uETotalWealth += i1*unequal[i1];}
+		{
+			uETotalWealth += i1*unequal[i1];
+		}
 
 		double[] uECumPop = new double[unequal.length];
 		double[] uECumWealth = new double[unequal.length];
