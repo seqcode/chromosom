@@ -7,11 +7,11 @@ There are three main functionalities: training new maps, viewing the maps, and u
 ## Training:
 An example command line prompt for training a new map is as follows:
 
-• java -Xmx38G MultiMap Train 50 50 1.2 0.2 1000 10 1 "My Map" "My Matrix" 40
+• java -Xmx38G MultiMap Train 50 50 1.2 0.2 1000 10 1 "My Map" "My Matrix" 40 0
 
 MultiMap is the package in which the code for training resides. The -Xmx38G argument is
 required to handle memory load. This call will produce a 50x50 map (2500 total nodes) named
-“My Map” based on the data in the “My Matrix” file. "My Matrix" must take the form of a path from the current directory to the matrix file. Training will proceed for 1000 iterations, with a kernel variance shrinking from 1.2 to 0.2. Ten maps will be trained for quality control, and training will occupy 40 processors (or the maximum available)
+“My Map” based on the data in the “My Matrix” file. "My Matrix" must take the form of a path from the current directory to the matrix file. Training will proceed for 1000 iterations, with a kernel variance shrinking from 1.2 to 0.2. Ten maps will be trained for quality control, and training will occupy 40 processors (or the maximum available). The final parameter indicates whether a second file should be saved containing the weight vectors for each, this file can be used for further map analysis. A zero in this parameter will save no such file, a 1 will save the file.
 
 ## Viewing
 An example command line prompts for viewing a trained map is as follows:
