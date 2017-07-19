@@ -1,43 +1,30 @@
 package org.seqcode.projects.somatic;
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.swing.text.Document;
-
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.commons.math3.distribution.NormalDistribution;
-import org.w3c.dom.DOMImplementation;
 
 public class DrawHex extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 	public double gini;
 	public int nodes,xs,ys,xNodes,yNodes, maxDataPoints, minDataPoints, colorNum, winW, winH, binSize;
-	public ArrayList<Node> coords;
 	public ArrayList<DataPoint> dataPoints;
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<Color> colors;
-	MiniSystem nodeSystem;
+	public MiniSystem nodeSystem;
 	public boolean multi, weighting, norm, equalWeight;
 	int swap, col, www;
 	public double sep, cutoff;
@@ -690,9 +677,9 @@ public class DrawHex extends JPanel
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
 		{
+			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(file));
-			String sizer = in.next();
-			//System.out.println(xo + "  x  "+ yo);
+			in.next();
 			in.next();
 			while(in.hasNextLine())
 			{
@@ -736,6 +723,7 @@ public class DrawHex extends JPanel
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
 		{
+			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(f));
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
@@ -782,7 +770,7 @@ public class DrawHex extends JPanel
 	    //colorBar(g);
 	    setBackground(Color.GRAY);
 	    
-	    int centerNode = 2450;
+//	    int centerNode = 2450;
 //	    System.out.println(centerNode);
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
@@ -1149,7 +1137,7 @@ public class DrawHex extends JPanel
 			System.out.println(nodeList.size());
 			maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
 			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size() * nodeList.get(0).blueWeight);
-			int maxTot = 0;
+
 			for(int i = 0; i<nodeList.size(); i++)
 			{
 				if(nodeList.get(i).counting.size()* nodeList.get(i).weight>maxDataPoints)
@@ -1183,7 +1171,6 @@ public class DrawHex extends JPanel
 			System.out.println(nodeList.size());
 			maxDataPoints = (int) (nodeList.get(0).counting.size());
 			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size());
-			int maxTot = 0;
 			for(int i = 0; i<nodeList.size(); i++)
 			{
 				if(nodeList.get(i).counting.size()>maxDataPoints)

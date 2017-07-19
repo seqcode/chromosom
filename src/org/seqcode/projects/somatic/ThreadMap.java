@@ -233,7 +233,6 @@ public class ThreadMap
 	//initialize -> iterate -> terminate
 	public void go() 
 	{
-		double init = System.currentTimeMillis();
 		generateDataPoints();
 		initialize();
 		iterater();
@@ -816,12 +815,6 @@ public class ThreadMap
 			FileWriter ff = new FileWriter(g,true);
 			b = new BufferedWriter(ff);
 			PrintWriter printer = new PrintWriter(b);
-			
-			
-			double timeTot = timerElse + timerIterate + timerAssign;
-			//printer.print("% Iteration = " + timerIterate/timeTot + "    % Assignment = " + timerAssign/timeTot + "    % other stuff = " + timerElse/timeTot+"\n");
-			//printer.print("Iteration = " + timerIterate + "    % Assignment = " + timerAssign + "    % other stuff = " + timerElse + "      *** remove before using drawHex***" +"\n");
-			
 			
 			printer.print(xNodes+"x"+yNodes+ "\nSigma:" + sgm + "->" + sgmStop +"\n");
 			for(int i = 0; i<xNodes; i++)

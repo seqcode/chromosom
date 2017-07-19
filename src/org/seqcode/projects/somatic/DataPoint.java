@@ -1,11 +1,7 @@
 package org.seqcode.projects.somatic;
-
-import java.util.Vector;
-
 public class DataPoint 
 {
 	public String look;
-	public Node myNode;
 	public MiniNode myMini;
 	public boolean count;
 	public int x,y;
@@ -24,11 +20,6 @@ public class DataPoint
 		minLocus = min;
 		maxLocus = max;
 		myMini = n;
-		count = true;
-	}
-	public DataPoint(Node n)
-	{
-		myNode = n;
 		count = true;
 	}
 	public DataPoint(String s)

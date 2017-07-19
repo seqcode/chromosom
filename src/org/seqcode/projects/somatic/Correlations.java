@@ -1,5 +1,4 @@
 package org.seqcode.projects.somatic;
-import java.awt.BorderLayout;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,8 +9,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 
 
 public class Correlations
@@ -21,11 +18,10 @@ public class Correlations
 	public String mapper, der;
 	public double gini, pVal;
 	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, locCol, weightCol, binSize;
-	public ArrayList<Node> coords;
 	public ArrayList<DataPoint> bins;
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<String> searchers,names;
-	MiniSystem nodeSystem;
+	public MiniSystem nodeSystem;
 	public boolean weighting, showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
 	public double[] sep;
@@ -280,6 +276,7 @@ public class Correlations
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
 		{
+			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(file));
 			in.next();
 			//System.out.println(xo + "  x  "+ yo);
@@ -298,6 +295,7 @@ public class Correlations
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
 		{
+			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(f));
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));

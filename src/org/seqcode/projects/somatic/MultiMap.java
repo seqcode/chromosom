@@ -1,19 +1,7 @@
 package org.seqcode.projects.somatic;
 import java.awt.BorderLayout;
-import java.awt.event.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 
 
 public class MultiMap extends JFrame
@@ -120,15 +108,6 @@ public class MultiMap extends JFrame
 			numberOfSoms = nnnn;
 			t = new ArrayList<ThreadMap>();
 		}
-//		public void run()
-//		{
-//			for(int i = 0; i < numberOfSoms; i++)
-//			{
-//    	    	ThreadMap o = new ThreadMap(xArg,yArg,sigmaArg, lr, iter, Integer.parseInt(args[7]), Integer.parseInt(args[8]), Integer.parseInt(args[9]), args[10], args[11], threadsFor));
-//   		 		o.go();
-//   		 		t.add(o);
-//    	    }
-//		}
 	}
 	 public static void main(String[] args)
 	  {
