@@ -499,15 +499,15 @@ public class ThreadMap
 	    }
 
 	    // covariation
-	    double cov = sxy / n - sx * sy / n / n;
+	    double cov = (sxy / n) - ((sx/n) * (sy/n));
 	    // standard error of x
-	    double sigmax = Math.sqrt(sxx / n -  sx * sx / n / n);
+	    double sigmax = Math.sqrt((sxx / n) -  ((sx/n) * (sx/n)));
 	    // standard error of y
-	    double sigmay = Math.sqrt(syy / n -  sy * sy / n / n);
+	    double sigmay = Math.sqrt((syy / n) -  ((sy/n) * (sy/n)));
 
 	    // correlation is just a normalized covariation
 	    
-	    double rr = cov / sigmax / sigmay;
+	    double rr = cov / (sigmax * sigmay);
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
 	    if(rr>1.0000001)
@@ -520,7 +520,7 @@ public class ThreadMap
 	{
 		for(double i = 0; i < iterations; i++)
 		{
-			//This code wirtes SOMs at different stages in training
+			//This code writes SOMs at different stages in training
 //			if(i%(iterations/4) == 0)
 //			{
 //				finishTraining();
@@ -799,7 +799,7 @@ public class ThreadMap
 		BufferedWriter b;
 		try 
 		{
-			String g = lander + " SOM ("+xNodes+"x"+yNodes+"), "+sgm+  "-"+sgmStop +", " + iterations + ", " + sampleSize + ", " + ((double)((int)(cosineQuality*10000))/10000)+ ", "+((double)((int)(pearsonQuality*10000))/10000)+ ", "+ ((double)((int)(stability*10000))/10000) + ", " + percentUnoccupied() + ".txt";
+			String g = lander + "_SOM-"+xNodes+"x"+yNodes+"_sigMax"+sgm+"_sigMin"+sgmStop +"_iter" + iterations + "_samp" + sampleSize + "_cosQ" + ((double)((int)(cosineQuality*10000))/10000)+ "_corrQ"+((double)((int)(pearsonQuality*10000))/10000)+ "_stability"+ ((double)((int)(stability*10000))/10000) + "_percUnocc" + percentUnoccupied() + ".txt";
 			System.out.println(g);
 			int counter = 0;
 			for(int i = 0; i < dpcount.length ; i++)
