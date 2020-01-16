@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -28,6 +30,7 @@ public class ThreadMap
 	int[][] neighborly, threadLims;
 	int[] dpcount;
 	int[] dpChr,dpPerChr;
+	Map<String, Integer> chr2id = new HashMap<String, Integer>();
 	
 	double[] dpMag, nMag, weightsByHood;
 	
@@ -158,8 +161,8 @@ public class ThreadMap
 				{
 					double initdist = -1;
 					int chr = dpChr[i];
-					double[] dpSmall = new double[dpSize-dpPerChr[chr-1]];
-					double[] nodeSmall = new double[dpSize-dpPerChr[chr-1]];
+					double[] dpSmall = new double[dpSize-dpPerChr[chr]];
+					double[] nodeSmall = new double[dpSize-dpPerChr[chr]];
 					int counter = 0;
 					for(int j = 0; j < dpSize; j++)
 					{
@@ -283,20 +286,21 @@ public class ThreadMap
 		{
 			String sss = points.get(i).name; 
 			dpNames[i] = sss;
-			dpChr[i] = Integer.parseInt(sss.substring(sss.indexOf("chr")+3,sss.indexOf(":")));
-			if(dpChr[i]>chrCount)
-				chrCount = dpChr[i];
-			dpPerChr = new int[chrCount];
-			//System.out.println(dpChr[i]);
+			String chr = sss.split(":")[0];
+			if(!chr2id.containsKey(chr)){
+				chr2id.put(chr, chrCount);
+				chrCount++;
+			}
+			dpChr[i] = chr2id.get(chr);
+			
 			dpMag[i] = points.get(i).updateMag();
 			if(dpMag[i]==0)
 				System.out.println("d  "+dpMag[i]);
 			dp[i] = points.get(i).g;
 		}
+		dpPerChr = new int[chrCount];
 		for(int i = 0; i < dpSize; i++)
-		{
-			dpPerChr[dpChr[i]-1]++;
-		}
+			dpPerChr[dpChr[i]]++;
 	}
 	
 	//Node vectors are each set equal to a randomly selected data point's vector - Also calls for neighbor assignment
