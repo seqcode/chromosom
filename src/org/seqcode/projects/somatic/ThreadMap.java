@@ -146,7 +146,7 @@ public class ThreadMap
 						}
 					}
 					if(initdist == 0)
-						System.out.print("shit");
+						System.err.print("error initdist==0");
 					//System.out.println(bestNode);
 					pAssign[i-threadLims[thisT][0]][bestNode] = true;
 					pp[bestNode]++;
@@ -221,7 +221,7 @@ public class ThreadMap
 					}
 					if(initdist <= 0)
 					{
-						System.out.println("fugg :^)");
+						System.err.println("error: initdist<=0");
 					}
 					//System.out.println(bestNode);
 					pAssign[i-threadLims[thisT][0]][bestNode] = true;
@@ -473,7 +473,7 @@ public class ThreadMap
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
 	    if(rr>1.0000001)
-	    	System.out.println("whoops");
+	    	System.err.println("error rr>1");
 	    return rr;
 	}
 	
@@ -511,7 +511,7 @@ public class ThreadMap
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
 	    if(rr>1.0000001)
-	    	System.out.println("whoops");
+	    	System.err.println("error rr>1");
 	    return rr;
 	}
 	
