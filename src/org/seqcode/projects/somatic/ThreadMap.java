@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+
 
 /**
  * 
@@ -31,12 +33,13 @@ public class ThreadMap
 	int[] dpcount;
 	int[] dpChr,dpPerChr;
 	Map<String, Integer> chr2id = new HashMap<String, Integer>();
+	PearsonsCorrelation pcorr = new PearsonsCorrelation();
 	
 	double[] dpMag, nMag, weightsByHood;
 	
-	public String lander;
+	public String filePrefix;
 	
-	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, int cosine, String name, String mat, int availibleThreads, boolean countIntraChrom)
+	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, int cosine, String outPrefix, String mat, int availibleThreads, boolean countIntraChrom)
 	{
 		countIntraChromosomal = countIntraChrom;
 		sgmStop = sigmaStop;
@@ -54,7 +57,7 @@ public class ThreadMap
 		nodeNum = xNode * yNode;
 		iterations = it;
 		String ff = System.getProperty("user.dir") + "/"+mat;
-		lander = name;
+		filePrefix = outPrefix;
 		reader = new Reader(ff);
 		cos = cosine == 1;
 		timerElse =0; timerIterate = 0; timerAssign = 0;
@@ -445,6 +448,7 @@ public class ThreadMap
 	
 	public double pearson(int iNode, int jDP)
 	{
+		/*
 		double sx = 0.0;
 	    double sy = 0.0;
 	    double sxx = 0.0;
@@ -478,11 +482,14 @@ public class ThreadMap
 	    	rr=1;
 	    if(rr>1.0000001)
 	    	System.err.println("error rr>1");
+	    	*/
+		double rr = pcorr.correlation(nodes[iNode], dp[jDP]);
 	    return rr;
 	}
 	
 	public double pearson(double[] nodal, double[] datal)
 	{
+		/*
 		double sx = 0.0;
 	    double sy = 0.0;
 	    double sxx = 0.0;
@@ -516,6 +523,8 @@ public class ThreadMap
 	    	rr=1;
 	    if(rr>1.0000001)
 	    	System.err.println("error rr>1");
+	    	*/
+		double rr = pcorr.correlation(nodal, datal);
 	    return rr;
 	}
 	
@@ -798,25 +807,19 @@ public class ThreadMap
 		return percent;
 	}
 	//Saves trained SOM in text file
-	public void writeFile(int sampleSize)
-	{		
+	public void writeFile(int sampleSize){		
 		BufferedWriter b;
+		
+		String somFilename = filePrefix+".som";
+		String infoFilename = filePrefix+".info";
+		String nodevecFilename = filePrefix+".nodevec";
+		
+		//SOM file
 		try 
 		{
-			String g = lander + "_SOM-"+xNodes+"x"+yNodes+"_sigMax"+sgm+"_sigMin"+sgmStop +"_iter" + iterations + "_samp" + sampleSize + "_cosQ" + ((double)((int)(cosineQuality*10000))/10000)+ "_corrQ"+((double)((int)(pearsonQuality*10000))/10000)+ "_stability"+ ((double)((int)(stability*10000))/10000) + "_percUnocc" + percentUnoccupied() + ".txt";
-			System.out.println(g);
-			int counter = 0;
-			for(int i = 0; i < dpcount.length ; i++)
-			{
-				counter += dpcount[i];
-			}
-			System.out.println(counter + "  " + dpSize);
-			for(int i = 0; i<dpNames.length; i++)
-			{
-				if(dpNames[i].length() > 29)
-					System.out.println("Name too long?   " +dpNames[i]);
-			}
-			FileWriter ff = new FileWriter(g,true);
+			System.out.println("Printing SOM to "+somFilename);
+						
+			FileWriter ff = new FileWriter(somFilename,true);
 			b = new BufferedWriter(ff);
 			PrintWriter printer = new PrintWriter(b);
 			
@@ -844,20 +847,45 @@ public class ThreadMap
 			}
 			printer.print("\n");
 			printer.close();
-		}
-		catch (IOException e) 
-		{
+		}catch (IOException e){
 			e.printStackTrace();
-			System.out.print("no way");
+			System.err.print("Error printing SOM file "+somFilename);
 		}
 		
+		//Info file
+		try 
+		{
+			System.out.println("Printing info to "+infoFilename);
+						
+			FileWriter ff = new FileWriter(infoFilename,true);
+			b = new BufferedWriter(ff);
+			PrintWriter printer = new PrintWriter(b);
+			
+			String simMetric = cos ? "cosine" : "pearson";
+			String intra = countIntraChromosomal ? "true" : "false";
+			
+			printer.print("Nodes:\t"+xNodes+"x"+yNodes+"\n" +
+						"Sigma:\t" + sgm + "->" + sgmStop +"\n" +
+						"Iterations:\t" + iterations +"\n" +
+						"SimilarityMetric:\t" + simMetric +"\n" +
+						"IncludingIntraChromosomal:\t" + intra +"\n" +
+						"Samples:\t" + sampleSize +"\n" +
+						"CosineQuality:\t" + cosineQuality +"\n" +
+						"PearsonQuality:\t" + pearsonQuality +"\n" +
+						"Stability:\t" + stability +"\n" +
+						"PercentUnoccupied:\t"+percentUnoccupied() +"\n");
+			printer.close();
+		
+		}catch (IOException e){
+			e.printStackTrace();
+			System.err.print("Error printing info file "+infoFilename);
+		}
 		
 		try 
 		{
-			String g = lander+ "_Node_Vectors.txt";
-			System.out.println(g);
+			System.out.println("Printing node vectors to "+nodevecFilename);
 			
-			FileWriter ff = new FileWriter(g,true);
+			FileWriter ff = new FileWriter(nodevecFilename,true);
 			b = new BufferedWriter(ff);
 			PrintWriter printer = new PrintWriter(b);
 			
@@ -877,7 +905,7 @@ public class ThreadMap
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-			System.out.print("no way");
+			System.err.print("Error printing node vector file "+nodevecFilename);
 		}
 	}
 }

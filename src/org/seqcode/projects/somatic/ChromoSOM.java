@@ -15,7 +15,7 @@ public class ChromoSOM {
 	double trainKvarMin = 0.2;
 	int trainNumSOM = 10;
 	int numProc = 1;
-	boolean trainSaveWeights = true;
+	boolean includeIntraChromosomal = true;
 	String trainSimilarity = "pearson";
 	
 	public ChromoSOM() {
@@ -33,7 +33,7 @@ public class ChromoSOM {
 	public void setTrainKvarMin(double i) {trainKvarMin=i;}
 	public void setTrainNumSOM(int i) {trainNumSOM=i;}
 	public void setNumProc(int i) {numProc=i;}
-	public void setTrainSaveWeights(boolean s) {trainSaveWeights=s;}
+	public void setIncludeIntraChromosomal(boolean s) {includeIntraChromosomal=s;}
 	public void setTrainSimilarity(String s){trainSimilarity = s;}
 	
 	
@@ -61,7 +61,7 @@ public class ChromoSOM {
 				"\t--kvarmin <double>: kernel variance min (default=" + trainKvarMin +")\n"+
 				"\t--numsom <int>: number of SOMs to train (default=" + trainNumSOM +")\n"+
 				"\t--np <int>: number of processors to use during training (default=" + numProc +")\n"+
-				"\t--noweightsfile: flag to not save the SOM weights file (default=save files)\n"+
+				//"\t--nointra: flag to not use intrachromosomal data during similarity calculations (default=save files)\n"+
 				"\t--sim <pearson/cosine>: similarity metric to use during training (default=" + trainSimilarity +")\n"+
 				"");
 
