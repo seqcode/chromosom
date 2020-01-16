@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-
 
 /**
  * 
@@ -33,7 +31,6 @@ public class ThreadMap
 	int[] dpcount;
 	int[] dpChr,dpPerChr;
 	Map<String, Integer> chr2id = new HashMap<String, Integer>();
-	PearsonsCorrelation pcorr = new PearsonsCorrelation();
 	
 	double[] dpMag, nMag, weightsByHood;
 	
@@ -448,7 +445,6 @@ public class ThreadMap
 	
 	public double pearson(int iNode, int jDP)
 	{
-		/*
 		double sx = 0.0;
 	    double sy = 0.0;
 	    double sxx = 0.0;
@@ -482,14 +478,12 @@ public class ThreadMap
 	    	rr=1;
 	    if(rr>1.0000001)
 	    	System.err.println("error rr>1");
-	    	*/
-		double rr = pcorr.correlation(nodes[iNode], dp[jDP]);
+
 	    return rr;
 	}
 	
 	public double pearson(double[] nodal, double[] datal)
 	{
-		/*
 		double sx = 0.0;
 	    double sy = 0.0;
 	    double sxx = 0.0;
@@ -523,8 +517,7 @@ public class ThreadMap
 	    	rr=1;
 	    if(rr>1.0000001)
 	    	System.err.println("error rr>1");
-	    	*/
-		double rr = pcorr.correlation(nodal, datal);
+
 	    return rr;
 	}
 	
