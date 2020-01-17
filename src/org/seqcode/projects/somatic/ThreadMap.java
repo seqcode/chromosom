@@ -295,7 +295,7 @@ public class ThreadMap
 			
 			dpMag[i] = points.get(i).updateMag();
 			if(dpMag[i]==0)
-				System.out.println("d  "+dpMag[i]);
+				System.err.println("d  "+dpMag[i]);
 			dp[i] = points.get(i).g;
 		}
 		dpPerChr = new int[chrCount];

@@ -165,17 +165,14 @@ public class Correlations
 		ArrayList<String> strings = inputRead(file);
 		for(String whole: strings)
 		{
-			int chr = 0;
+			String chr;
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
 			String[] wholes = whole.split("\t");
 			//System.out.println(whole);
 			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
 			{
-				if(wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("X")||wholes[col].substring(wholes[col].indexOf("chr")+3).equalsIgnoreCase("Y"))
-					chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3));
+				chr=wholes[col];
 				String loc1 = wholes[1];
 				locus1 = Integer.parseInt(loc1);
 				locus2 = Integer.parseInt(wholes[2]);
@@ -190,7 +187,7 @@ public class Correlations
 				{
 					for(int i = 0; i< bins.size(); i++)
 					{
-						if(bins.get(i).chrome == chr && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
+						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
 						{
 							count++;
 							inds.add(i);
@@ -208,10 +205,7 @@ public class Correlations
 			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
-				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
-						chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")));
+				chr = wholes[col].split(":")[0];
 				locus1 = Integer.parseInt(wholes[col].substring(whole.indexOf(":")+1));
 				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
 				int locus = locus1;//(locus1 +locus2)/2;
@@ -221,7 +215,7 @@ public class Correlations
 					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
 				for(int i = 0; i< bins.size(); i++)
 				{
-					if(bins.get(i).chrome == chr && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
+					if(bins.get(i).chrome.contentEquals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
 					{
 						bins.get(i).myMini.counting.add(bins.get(i));
 						bins.get(i).myMini.weight += weight;
@@ -231,10 +225,7 @@ public class Correlations
 			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
-				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
-						chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("chr")+3,wholes[col].indexOf(":")));
+				chr = wholes[locCol].split(":")[0];
 				
 				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
 				locus1 = Integer.parseInt(loc1);
@@ -250,7 +241,7 @@ public class Correlations
 				{
 					for(int i = 0; i< bins.size(); i++)
 					{
-						if(bins.get(i).chrome == chr && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
+						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
 						{
 							count++;
 							inds.add(i);

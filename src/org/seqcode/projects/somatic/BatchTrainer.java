@@ -58,6 +58,7 @@ public class BatchTrainer extends JFrame
 		d.nodeBuild(700,700);
     	//d.colors();
     	d.heatMapping();
+    	d.countingDPS(null);
 	 }
 	 //Finds and shows chromes
 	 public void setUpMenu(JMenuBar menubar)
@@ -70,11 +71,11 @@ public class BatchTrainer extends JFrame
 	     menubar.add(search2);
 	     JButton view = new JButton("View Swap");
 	     menubar.add(view);
-	     JButton button = new JButton("Chr");
+	     JButton button = new JButton("chr");
 	     menubar.add(button);
 	     
 	     
-        final JTextField texter = new JTextField("Chr...", 20);
+        final JTextField texter = new JTextField("chr...", 20);
 	    menubar.add(texter);
 	    menubar.add(Box.createHorizontalGlue());
 	    
@@ -84,10 +85,8 @@ public class BatchTrainer extends JFrame
             {
                 //Execute when button is pressed
                 find = texter.getText();
-                int chr = 0;
-                try{chr = Integer.parseInt(find);
-                }catch (NumberFormatException u){chr = 0;}
-                d.countingDPS(chr);
+
+                d.countingDPS(find);
             }
         });
 	    save.addActionListener(new ActionListener() {

@@ -179,7 +179,7 @@ public class DrawCompartment extends JPanel
 		ArrayList<String> strings = inputRead(file);
 		for(String whole: strings)
 		{
-			int chr = 0;
+			String chr;
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
 			String[] wholes = whole.split("\t");
@@ -187,10 +187,7 @@ public class DrawCompartment extends JPanel
 			if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
-				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
-						chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("chr")+3,wholes[col].indexOf(":")));
+				chr = wholes[col].split(":")[0];
 				
 				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
 				locus1 = Integer.parseInt(loc1);
@@ -206,7 +203,7 @@ public class DrawCompartment extends JPanel
 				{
 					for(int i = 0; i< dataPoints.size(); i++)
 					{
-						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
 						{
 							count++;
 							inds.add(i);
@@ -239,7 +236,7 @@ public class DrawCompartment extends JPanel
 		ArrayList<String> strings = inputRead(file);
 		for(String whole: strings)
 		{
-			int chr = 0;
+			String chr;
 			int locus1 = 0; int locus2 = 0;
 			double weight = 0;
 			String[] wholes = whole.split("\t");
@@ -247,10 +244,7 @@ public class DrawCompartment extends JPanel
 			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
 			{
 				weighting = true;
-				if(wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[col].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
-						chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[locCol].substring(whole.indexOf("chr")+3,whole.indexOf(":")));
+				chr = wholes[locCol].split(":")[0];
 				locus1 = Integer.parseInt(wholes[locCol].substring(whole.indexOf(":")+1));
 				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
 				int locus = locus1;//(locus1 +locus2)/2;
@@ -260,7 +254,7 @@ public class DrawCompartment extends JPanel
 					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
 				for(int i = 0; i< dataPoints.size(); i++)
 				{
-					if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+					if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
 					{
 						//System.out.println(chr + " " + locus + "  " + i);
 						dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
@@ -271,10 +265,7 @@ public class DrawCompartment extends JPanel
 			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[locCol].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
 			{
 				weighting = true;
-				if(wholes[locCol].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("X")||wholes[locCol].substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("Y"))
-						chr = 23;
-				else 
-					chr  = Integer.parseInt(wholes[locCol].substring(wholes[locCol].indexOf("chr")+3,wholes[locCol].indexOf(":")));
+				chr = wholes[locCol].split(":")[0];
 				
 				String loc1 = wholes[locCol].substring(wholes[locCol].indexOf(":")+1, wholes[locCol].indexOf("-"));
 				locus1 = Integer.parseInt(loc1);
@@ -290,7 +281,7 @@ public class DrawCompartment extends JPanel
 				{
 					for(int i = 0; i< dataPoints.size(); i++)
 					{
-						if(dataPoints.get(i).chrome == chr && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
+						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
 						{
 							count++;
 							inds.add(i);
@@ -329,7 +320,7 @@ public class DrawCompartment extends JPanel
 		return StringMat;
 
 	}
-	public void countingDPS(int chr)
+	public void countingDPS(String chr)
 	{
 		multi = false;
 		weighting = false;
@@ -339,14 +330,15 @@ public class DrawCompartment extends JPanel
 			mini.counting.clear();
 			for(int j =0; j<mini.bins.size(); j++)
 			{
-				if(chr <= -1)
-				{
-					if(Math.random()>.9)
-						mini.counting.add(mini.bins.get(j));
-				}
-				else if (chr == 0)
+				//if(chr <= -1)
+				//{
+				//	if(Math.random()>.9)
+				//		mini.counting.add(mini.bins.get(j));
+				//}
+				//else 
+				if (chr == null)
 					mini.counting.add(mini.bins.get(j));
-				else if (mini.bins.get(j).chrome == chr)
+				else if (mini.bins.get(j).chrome.equals(chr))
 					mini.counting.add(mini.bins.get(j));
 			}
 			//System.out.println(mini.counting.size());

@@ -8,13 +8,14 @@ public class DataPoint
 	public double mag;
 	public double[] g;
 	public String name;
-	public int chrome, minLocus, maxLocus;
+	public String chrome;
+	public int minLocus, maxLocus;
 	
 	public DataPoint()
 	{
 		count = true;
 	}
-	public DataPoint(int chr, int min, int max, MiniNode n)
+	public DataPoint(String chr, int min, int max, MiniNode n)
 	{
 		chrome = chr;
 		minLocus = min;

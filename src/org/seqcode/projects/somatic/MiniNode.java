@@ -37,7 +37,7 @@ public class MiniNode
 			s = s.substring(s.indexOf("(")+1, s.length());
 		if(s.contains(":")&&s.contains("-"))
 		{
-			int chrome = Integer.parseInt(s.substring(s.indexOf("chr")+3, s.indexOf(":")));
+			String chrome = s.split(":")[0];
 			int minLocus = Integer.parseInt(s.substring(s.indexOf(":")+1, s.indexOf("-")));
 			int maxLocus = Integer.parseInt(s.substring(s.indexOf("-")+1, s.length()));
 			{
