@@ -118,7 +118,7 @@ public class DrawCompartment extends JPanel
 		}
 	}
 	
-	public void saveImg(String name, String file, int w, int h)
+	public void saveImg(String name, File dir, int w, int h)
 	{
 		BufferedImage image = null;
 		try {
@@ -130,7 +130,7 @@ public class DrawCompartment extends JPanel
 	    print(gg);
 	    try 
 	    {
-	        File outputfile = new File(file+"/"+name+".png");
+	        File outputfile = new File(dir.getAbsolutePath()+"/"+name+".png");
 	        ImageIO.write(image, "png", outputfile);
 	    } catch (IOException e) {}
 	}

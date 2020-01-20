@@ -16,12 +16,13 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 public class UseMap
 {
 	public DrawHex d;
-	public String fold, mapper, der;
+	public String fold, mapper;
+	public File outDir;
 	public double gini, pVal;
 	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, locCol, weightCol, binSize;
 	public ArrayList<DataPoint> bins;
 	public ArrayList<MiniNode> nodeList;
-	public ArrayList<String> searchers;
+	public ArrayList<File> searchers;
 	public MiniSystem nodeSystem;
 	public boolean weighting, showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
@@ -32,29 +33,30 @@ public class UseMap
 		pics = pic;
 		mapper = map;
 		fold = fillle;
-		der =System.getProperty("user.dir")+"/"+"Lorenz_Area_"+fold;
+		outDir =new File(System.getProperty("user.dir")+"/"+"Lorenz_Area_"+fold);
 		locCol = locCols;
 		weightCol = weightCols;
 		pValnVal= 1000;
 		showPVal = true;
 		gini=0;
 		weighting = true;
-		String mapp = System.getProperty("user.dir")+"/"+map;
+		String mapp = map;
 		equalWeight = weightin;
 		yNodes=0;
 		xNodes=0;
-		searchers = new ArrayList<String>();
+		searchers = new ArrayList<File>();
 		mapReader(mapp);
 		pVal = 0;
 		binSize = bins.get(0).maxLocus - bins.get(0).minLocus;
-		File folder = new File(System.getProperty("user.dir")+"/"+fillle);
+		File folder = new File(fillle);
+		System.out.println("Analyzing files in "+folder.getAbsolutePath());
 		File[] listOfFiles = folder.listFiles();
 
 		for (File file : listOfFiles) 
 		{
 		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1 || file.getName().indexOf(".peaks")!=-1 || file.getName().indexOf(".narrowpeaks")!=-1)|| file.getName().indexOf(".bed")!=-1) 
 		    {
-		    	searchers.add(file.getName());
+		    	searchers.add(file);
 		    }
 		}
 		nodes = yNodes*xNodes;
@@ -68,15 +70,15 @@ public class UseMap
 	{
 		if(pics)
 		{
-			new File(der).mkdir();
+			outDir.mkdir();
 			d = new DrawHex(mapper);
-			d.nodeBuild(700,700);
+			d.nodeBuild(2000,2000);
 	    	d.heatMapping();
 	    	d.countingDPS(null);
-	    	d.saveImg("whole_map", der,  700, 700);
+	    	d.saveImg("whole_map", outDir,  2000, 2000);
 		}
 		ArrayList<String> writer = new ArrayList<String>();
-		writer.add("File \t gini \t giniW/WeightedBaseline(n="+pValnVal+")\tzScore\n");
+		writer.add("File\tgini\tginiW/WeightedBaseline(n="+pValnVal+")\tzScore");
 		for (int i = 0; i < searchers.size()-1; i++)
 		{
 			for(int j = i; j < searchers.size(); j++)
@@ -95,17 +97,17 @@ public class UseMap
 	{
 		if(pics)
 		{
-			new File(der).mkdir();
+			outDir.mkdir();
 			d = new DrawHex(mapper);
-			d.nodeBuild(700,700);
+			d.nodeBuild(2000,2000);
 	    	//d.colors();
 	    	d.heatMapping();
 	    	d.countingDPS(null);
-	    	d.saveImg("whole_map", der,  700, 700);
+	    	d.saveImg("whole_map", outDir,  2000, 2000);
 		}
 		ArrayList<String> writer = new ArrayList<String>();
-		writer.add("File \t gini \t giniW/WeightedBaseline(n="+pValnVal+")\tzScore\n");
-		for (String s:searchers)
+		writer.add("File\tgini\tginiW/WeightedBaseline(n="+pValnVal+")\tzScore");
+		for (File s:searchers)
 		{
 			g = new double[nodes+2][pValnVal+1];
 			gini = 0;
@@ -116,24 +118,24 @@ public class UseMap
 		writeFile(writer);
 		System.out.println("done");
 	}
-	public void multiSearch(String file1, String file2)
+	public void multiSearch(File file1, File file2)
 	{
 		if(pics)
 		{
 			//d.search(fold+"/"+file, locCol, weightCol);
-			d.multiSearch(fold+"/"+file1, fold+"/"+file2);
+			d.multiSearch(file1, file2);
 			d.repaint();
-			d.saveImg(file1+"_"+file2, der, 700, 700);
+			d.saveImg(file1.getName()+"_"+file2.getName(), outDir, 2000, 2000);
 		}
 	}
-	public void search(String file)
+	public void search(File file)
 	{
 		if(pics)
 		{
 			d.equalWeight = (weightCol == -1);
-			d.search(fold+"/"+file, locCol, weightCol);
+			d.search(file, locCol, weightCol);
 			d.repaint();
-			d.saveImg(file, der, 700, 700);
+			d.saveImg(file.getName(), outDir, 2000, 2000);
 		}
 		for(int i = 0; i < nodeSystem.size(); i++)
 		{
@@ -160,7 +162,7 @@ public class UseMap
 					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
 				int locus = locus1;
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
+				double count = 0;
 				while(locus<locus2)
 				{
 					for(int i = 0; i< bins.size(); i++)
@@ -183,7 +185,8 @@ public class UseMap
 						g[ree][p] += weight;
 					}
 				}
-				weight/=count;
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					bins.get(i).myMini.counting.add(bins.get(i));
@@ -238,7 +241,7 @@ public class UseMap
 					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
 				int locus = locus1;
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
+				double count = 0;
 				while(locus<locus2)
 				{
 					for(int i = 0; i< bins.size(); i++)
@@ -261,7 +264,8 @@ public class UseMap
 						g[ree][p] += weight;
 					}
 				}
-				weight/=count;
+				if(equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					bins.get(i).myMini.counting.add(bins.get(i));
@@ -276,7 +280,7 @@ public class UseMap
 		pVal();
 		/**degreesOfSep();*/
 	}
-	public String coClustering(String file1, String file2)
+	public String coClustering(File file1, File file2)
 	{
 		return "";
 	}
@@ -405,13 +409,13 @@ public class UseMap
 		double eArea = 0;
 		for(int num = 1; num<=pValnVal; num++)
 		{
-			int maxWeight = 0;
+			double maxWeight = 0;
 			for(int i = 0; i<nodeList.size(); i++)
 			{
 				if(g[i][num]>maxWeight)
 					maxWeight = (int) g[i][num];
 			}
-			double[] equal = new double[maxWeight+1];
+			double[] equal = new double[(int)maxWeight+1];
 			for(int i=0; i<nodeList.size(); i++)
 			{
 				int o = (int) g[i][num];
@@ -427,8 +431,8 @@ public class UseMap
 				eQTotalWealth += i*equal[i];
 			}
 			
-			double[] eQCumPop = new double[maxWeight+1];
-			double[] eQCumWealth = new double[maxWeight+1];
+			double[] eQCumPop = new double[(int)maxWeight+1];
+			double[] eQCumWealth = new double[(int)maxWeight+1];
 			
 			eQCumPop[0] = equal[0]/(double)nodeList.size();
 			eQCumWealth[0] = 0;
@@ -437,7 +441,7 @@ public class UseMap
 				eQCumPop[i] = equal[i]/(double)nodeList.size() + eQCumPop[i-1];
 				eQCumWealth[i] = (equal[i]*i)/eQTotalWealth + eQCumWealth[i-1];
 			}		
-			//Equaliy area
+			//Equality area
 			for(int i=0; i<equal.length-1; i++)
 			{
 				g[nodes][num]+=(((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i])+((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i+1]))/2;
@@ -595,13 +599,13 @@ public class UseMap
 		g[nodes+1][0] = gini;
 		gini=0;
 	}
-	public ArrayList<String> inputRead(String file)
+	public ArrayList<String> inputRead(File file)
 	{
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
 		{
 			@SuppressWarnings("resource")
-			Scanner in = new Scanner(new FileReader(System.getProperty("user.dir")+"/"+fold+"/"+file));
+			Scanner in = new Scanner(new FileReader(file));
 			in.next();
 			//System.out.println(xo + "  x  "+ yo);
 			in.next();
@@ -682,7 +686,7 @@ public class UseMap
 		{
 			FileWriter ff;
 			if(pics)
-				ff = new FileWriter(der+ "/"+"Lorenz_analysis.txt",true);       //File Naming System needed
+				ff = new FileWriter(outDir+ "/"+"Lorenz_analysis.txt",true);       //File Naming System needed
 			else
 				ff = new FileWriter("Lorenz_Analysis.txt",true);
 			b = new BufferedWriter(ff);

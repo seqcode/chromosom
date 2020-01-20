@@ -26,7 +26,7 @@ public class DrawHex extends JPanel
 	public ArrayList<Color> colors;
 	public MiniSystem nodeSystem;
 	public boolean multi, weighting, norm, equalWeight;
-	int swap, col, www;
+	int swap, col, www, xMin, yMin, xMax, yMax, fontSize=10;
 	public double sep, cutoff;
 	public DrawHex(String s)
 	{
@@ -72,7 +72,7 @@ public class DrawHex extends JPanel
     	equalWeight = equalW;
     	//System.out.println(binSize);
 	}
-	public void saveImg(String name, String file)
+	public void saveImg(String name, File outDir)
 	{
 		BufferedImage image = null;
 		try {
@@ -82,11 +82,11 @@ public class DrawHex extends JPanel
 		}
 	    try 
 	    {
-	        File outputfile = new File(file+"/"+name+".png");
+	        File outputfile = new File(outDir.getAbsolutePath()+"/"+name+".png");
 	        ImageIO.write(image, "png", outputfile);
 	    } catch (IOException e) {}
 	}
-	public void saveImg(String name, String file, int w, int h)
+	public void saveImg(String name, File outDir, int w, int h)
 	{
 		this.setVisible(true);
 		this.setSize(w, h);
@@ -95,7 +95,7 @@ public class DrawHex extends JPanel
 	    print(g);
 	    try 
 	    {
-	        File outputfile = new File(file+"/"+name+".png");
+	        File outputfile = new File(outDir.getAbsolutePath()+"/"+name+".png");
 	        ImageIO.write(bi, "png", outputfile);
 	    } catch (IOException e) {}
 	}
@@ -119,7 +119,7 @@ public class DrawHex extends JPanel
 		}
 		repaint();
 	}
-	public void multiSearch(String file1, String file2)
+	public void multiSearch(File file1, File file2)
 	{
 		multi = true;
 		if(file1.equals(file2))
@@ -331,7 +331,7 @@ public class DrawHex extends JPanel
 		//degreesOfSep();
 		repaint();
 	}
-	public void search(String file)
+	public void search(File file)
 	{
 		multi = false;
 		for(int i = 0; i < nodeSystem.size(); i++)
@@ -440,7 +440,7 @@ public class DrawHex extends JPanel
 		degreesOfSep();
 		repaint();
 	}
-	public void search(String file, int locCol, int weightCol)
+	public void search(File file, int locCol, int weightCol)
 	{
 		multi = false;
 		for(int i = 0; i < nodeSystem.size(); i++)
@@ -636,7 +636,7 @@ public class DrawHex extends JPanel
 		gini = dArea / (lArea + dArea);
 	}
 	
-	public ArrayList<String> inputRead(String file)
+	public ArrayList<String> inputRead(File file)
 	{
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
@@ -733,7 +733,7 @@ public class DrawHex extends JPanel
 	  {
 	    super.paintComponent(g);
 	    //colorBar(g);
-	    setBackground(Color.GRAY);
+	    //setBackground(Color.BLUE);
 	    
 //	    int centerNode = 2450;
 //	    System.out.println(centerNode);
@@ -795,22 +795,25 @@ public class DrawHex extends JPanel
 	    	if(swap==2||swap ==3)
 	    	{
 	    		g.setColor(Color.BLACK);
-		    	g.setFont(new Font("Serif", 5, 9));
+		    	g.setFont(new Font("Arial", Font.PLAIN, fontSize));
 		    	g.drawString(""+nodeList.get(i).counting.size(),nodeList.get(i).xLoc-4, nodeList.get(i).yLoc+5);
 		    	g.drawPolygon(nodeList.get(i).p);
 	    	}
 	    }
 	    g.setColor(Color.BLACK);
-    	g.setFont(new Font("Serif", 5, 9));
-    	g.drawString("Gini = "+gini, getWidth()-200, 15);
+    	g.setFont(new Font("Arial", Font.PLAIN, fontSize));
+    	String giniStr = String.format("Gini = %.4f", gini);
+    	g.drawString(giniStr, (getWidth()/2)-(g.getFontMetrics().stringWidth(giniStr)/2), (yMin/2)-(g.getFontMetrics().getHeight()/2));
     	//g.drawString("Sep = "+ sep, getWidth()-400, 15);
 	}
 	public void nodeBuild(int winW, int winH)
 	{  
-		int xMin = (int)(.1 * winW);
-	    int yMin = (int)(.05 * winH);
-	    int xMax = (int)(.90 * winW);
-	    int yMax = (int)(.85 * winH);
+		xMin = (int)(.1 * winW);
+	    yMin = (int)(.1 * winH);
+	    xMax = (int)(.9 * winW);
+	    yMax = (int)(.9 * winH);
+	    fontSize = winH/85;
+	    
 		
 	    double winWidth = xMax-xMin;
 	    double winHeight = yMax-yMin;

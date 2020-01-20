@@ -93,7 +93,7 @@ public class BatchTrainer extends JFrame
 	    	 
             public void actionPerformed(ActionEvent e)
             {
-                d.saveImg(texter.getText(),System.getProperty("user.dir"));
+                d.saveImg(texter.getText(),new File(System.getProperty("user.dir")));
             }
         });
 	    search.addActionListener(new ActionListener() {
@@ -101,7 +101,7 @@ public class BatchTrainer extends JFrame
             public void actionPerformed(ActionEvent e)
             {
                 //Execute when search is pressed
-            	String trained = "";
+            	File trained=null;
  	    		JFileChooser chooser = new JFileChooser();
  	    	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
  	    	        "TXT files", "txt");
@@ -109,10 +109,10 @@ public class BatchTrainer extends JFrame
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    int returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
- 	    	    	trained = chooser.getSelectedFile().getPath();
+ 	    	    	trained = chooser.getSelectedFile();
  	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
- 	    	if(d != null)
+ 	    	if(d != null && trained !=null)
  	    		d.search(trained);
             }
         });
@@ -122,7 +122,7 @@ public class BatchTrainer extends JFrame
             public void actionPerformed(ActionEvent e)
             {
                 //Execute when search is pressed
-            	String trained = "";
+            	File trained=null, trained2=null;
  	    		JFileChooser chooser = new JFileChooser();
  	    	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
  	    	        "TXT files", "txt");
@@ -130,11 +130,10 @@ public class BatchTrainer extends JFrame
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    int returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
- 	    	    	trained = chooser.getSelectedFile().getPath();
+ 	    	    	trained = chooser.getSelectedFile();
  	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
- 	    	 //Execute when search is pressed
-            	String trained2 = "";
+ 	    	    //Execute when search is pressed
  	    		chooser = new JFileChooser();
  	    	    filter = new FileNameExtensionFilter(
  	    	        "TXT files", "txt");
@@ -142,10 +141,10 @@ public class BatchTrainer extends JFrame
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
- 	    	    	trained2 = chooser.getSelectedFile().getPath();
+ 	    	    	trained2 = chooser.getSelectedFile();
  	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
- 	    	if(d != null)
+ 	    	if(d != null && trained!=null && trained2!=null)
  	    		d.multiSearch(trained, trained2);
             }
         });
