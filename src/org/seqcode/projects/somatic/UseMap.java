@@ -143,38 +143,38 @@ public class UseMap
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String[] wholes = whole.split("\t");
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_") )
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
+		
+			while(reader.hasNext())
 			{
-				chr=wholes[0];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
+					
 				ArrayList<Integer> inds = new ArrayList<Integer>();
 				double count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< bins.size(); i++)
-					{
-						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
-						{
-							
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< bins.size(); i++){
+					//Overlap assessment 
+					if(bins.get(i).chrome.equals(reg.chr) && 
+							(bins.get(i).minLocus <= reg.start && bins.get(i).maxLocus >= reg.start) ||
+							(reg.start <= bins.get(i).minLocus && reg.end >= bins.get(i).maxLocus ) )
+							{
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(bins.get(i).chrome.equals(reg.chr) && 
+										(bins.get(i).minLocus <= reg.start && bins.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
 				if(showPVal)
 				{
@@ -192,93 +192,17 @@ public class UseMap
 					bins.get(i).myMini.counting.add(bins.get(i));
 					bins.get(i).myMini.weight += weight;
 					g[nodeList.indexOf(bins.get(i).myMini)][0] += weight;
-					//System.out.println(weight);
+	
 				}
+	
 			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
-			{
-				weighting = true;
-				chr = wholes[locCol].split(":")[0];
-				locus1 = Integer.parseInt(wholes[locCol].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< bins.size(); i++)
-				{
-					if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus >=locus)
-					{
-						//System.out.println(bins.get(i).name +" "+ bins.get(i).minLocus + "  "+ bins.get(i).maxLocus + "     "+ locus + "   " + whole);
-						bins.get(i).myMini.counting.add(bins.get(i));
-						bins.get(i).myMini.weight += weight;
-						g[nodeList.indexOf(bins.get(i).myMini)][0] += weight;
-						//System.out.println(weight);
-						if(showPVal)
-						{
-							for(int p = 1; p<g[0].length; p++)
-							{
-								int ree = (int) (Math.random()*bins.size());
-								ree = nodeList.indexOf(bins.get(ree).myMini);
-								g[ree][p] += weight;
-							}
-						}
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[locCol].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[locCol].split(":")[0];
-				
-				String loc1 = wholes[locCol].substring(wholes[locCol].indexOf(":")+1, wholes[locCol].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[locCol].substring(wholes[locCol].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				double count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< bins.size(); i++)
-					{
-						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
-						{
-							
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				if(showPVal)
-				{
-					for(int p = 1; p<g[0].length; p++)
-					{
-						int ree = (int) (Math.random()*bins.size());
-						ree = nodeList.indexOf(bins.get(ree).myMini);
-						g[ree][p] += weight;
-					}
-				}
-				if(equalWeight)
-					weight/=count;
-				for(Integer i: inds)
-				{
-					bins.get(i).myMini.counting.add(bins.get(i));
-					bins.get(i).myMini.weight += weight;
-					g[nodeList.indexOf(bins.get(i).myMini)][0] += weight;
-					//System.out.println(weight);
-				}
-			}
+			giniWithWeightedBaseline();
+			gini();
+			pVal();
+		
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		giniWithWeightedBaseline();
-		gini();
-		pVal();
-		/**degreesOfSep();*/
 	}
 	public String coClustering(File file1, File file2)
 	{
@@ -599,24 +523,7 @@ public class UseMap
 		g[nodes+1][0] = gini;
 		gini=0;
 	}
-	public ArrayList<String> inputRead(File file)
-	{
-		ArrayList<String> StringMat = new ArrayList<String>();
-		try 
-		{
-			@SuppressWarnings("resource")
-			Scanner in = new Scanner(new FileReader(file));
-			in.next();
-			//System.out.println(xo + "  x  "+ yo);
-			in.next();
-			while(in.hasNextLine())
-			{
-				StringMat.add(in.nextLine());
-			}
-		} catch (FileNotFoundException e) {e.printStackTrace();}
-		return StringMat;
-
-	}
+	
 	
 	public void mapReader(String f)
 	{
