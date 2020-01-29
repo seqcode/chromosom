@@ -164,7 +164,7 @@ public class UseMap
 					//Overlap assessment 
 					if(bins.get(i).chrome.equals(reg.chr) && 
 							(bins.get(i).minLocus <= reg.start && bins.get(i).maxLocus >= reg.start) ||
-							(reg.start <= bins.get(i).minLocus && reg.end >= bins.get(i).maxLocus ) )
+							(reg.start <= bins.get(i).minLocus && reg.end >= bins.get(i).minLocus ) )
 							{
 								count++;
 								inds.add(i);
