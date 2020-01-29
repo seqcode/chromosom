@@ -15,7 +15,7 @@ public class Correlations
 {
 	public DrawHex d;
 	public ArrayList<String> fold;
-	public String mapper, der;
+	public String mapper;
 	public double gini, pVal;
 	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, locCol, weightCol, binSize;
 	public ArrayList<DataPoint> bins;
@@ -31,14 +31,13 @@ public class Correlations
 		equalWeight = true;
 		mapper = map;
 		fold = fillle;
-		der =System.getProperty("user.dir")+"/"+"Lorenz_Area_"+fold;
 		locCol = 0;
 		weightCol = 1;
 		pValnVal= 1000;
 		showPVal = true;
 		gini=0;
 		weighting = true;
-		String mapp = System.getProperty("user.dir")+"/"+map;
+		String mapp = map;
 		yNodes=0;
 		xNodes=0;
 		searchers = new ArrayList<String>();
@@ -48,7 +47,7 @@ public class Correlations
 		binSize = bins.get(0).maxLocus - bins.get(0).minLocus;
 		for(String fs: fold)
 		{
-			File folder = new File(System.getProperty("user.dir")+"/"+fs);
+			File folder = new File(fs);
 			File[] listOfFiles = folder.listFiles();
 			for (File file : listOfFiles) 
 			{

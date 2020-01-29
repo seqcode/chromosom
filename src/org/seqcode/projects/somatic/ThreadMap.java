@@ -53,7 +53,7 @@ public class ThreadMap
 		sgm = sigma;
 		nodeNum = xNode * yNode;
 		iterations = it;
-		String ff = System.getProperty("user.dir") + "/"+mat;
+		String ff = mat;
 		filePrefix = outPrefix;
 		reader = new Reader(ff);
 		cos = cosine == 1;

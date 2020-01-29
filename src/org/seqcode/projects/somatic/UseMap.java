@@ -28,12 +28,13 @@ public class UseMap
 	public double[][] g;
 	public double[] sep;
 	
-	public UseMap(String map, String fillle, int locCols, int weightCols, boolean pic, boolean weightin)
+	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean weightin)
 	{
 		pics = pic;
 		mapper = map;
 		fold = fillle;
-		outDir =new File(System.getProperty("user.dir")+"/"+"Lorenz_Area_"+fold);
+		File folder = new File(fillle);
+		outDir =new File(outdir);
 		locCol = locCols;
 		weightCol = weightCols;
 		pValnVal= 1000;
@@ -48,7 +49,6 @@ public class UseMap
 		mapReader(mapp);
 		pVal = 0;
 		binSize = bins.get(0).maxLocus - bins.get(0).minLocus;
-		File folder = new File(fillle);
 		System.out.println("Analyzing files in "+folder.getAbsolutePath());
 		File[] listOfFiles = folder.listFiles();
 

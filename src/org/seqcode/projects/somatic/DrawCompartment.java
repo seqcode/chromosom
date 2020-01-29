@@ -57,12 +57,12 @@ public class DrawCompartment extends JPanel
     	col = 0;
     	www = 0;
     	equalWeight = true;
-    	String mapp = System.getProperty("user.dir")+"/"+map;
+    	String mapp = map;
     	
     	searchers = new ArrayList<String>();
     	compNames = new ArrayList<String>();
     	mapReader(mapp);
-		File folder = new File(System.getProperty("user.dir")+"/"+directory);
+		File folder = new File(directory);
 		File[] listOfFiles = folder.listFiles();
 
 		for (File file : listOfFiles) 
