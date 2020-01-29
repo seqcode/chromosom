@@ -216,7 +216,7 @@ public class BatchTrainer extends JFrame
 	    	{
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
-	    		UseMap u = new UseMap(mapFileName, searchFiles, Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1,Integer.parseInt(args[4])==-1 );
+	    		UseMap u = new UseMap(mapFileName, searchFiles, args[6], Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1,Integer.parseInt(args[4])==-1 );
 	    		u.searchSystem();
 	    	}
 	    	if(args[0].equalsIgnoreCase("compartments"))
@@ -245,7 +245,7 @@ public class BatchTrainer extends JFrame
 	    	{
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
-	    		UseMap u = new UseMap(mapFileName, searchFiles, Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1, Integer.parseInt(args[4])==-1);
+	    		UseMap u = new UseMap(mapFileName, searchFiles, args[6], Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1, Integer.parseInt(args[4])==-1);
 	    		u.searchSystemDouble();
 	    	}
 	}
