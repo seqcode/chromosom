@@ -34,10 +34,10 @@ public class BEDLine {
 		String[] array = line.split("\t");
 		chrom = array[0];
         
-        Matcher m = chromPattern.matcher(chrom);
-        if(m.matches()) { 
-            chrom = m.group(1);
-        }
+        //Matcher m = chromPattern.matcher(chrom);
+        //if(m.matches()) { 
+        //    chrom = m.group(1);
+        //}
         
 		chromStart = Integer.parseInt(array[1]);
 		chromEnd = Integer.parseInt(array[2]);

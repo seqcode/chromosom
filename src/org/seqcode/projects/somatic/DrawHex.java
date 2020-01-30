@@ -2,6 +2,7 @@ package org.seqcode.projects.somatic;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -48,7 +49,6 @@ public class DrawHex extends JPanel
     	col = 0;
     	www = 1;
     	equalWeight = false;
-    	//System.out.println(binSize);
 	}
 	public DrawHex(String s, int colLoc, int weightLoc, boolean equalW)
 	{
@@ -70,8 +70,9 @@ public class DrawHex extends JPanel
     	col = colLoc;
     	www = weightLoc;
     	equalWeight = equalW;
-    	//System.out.println(binSize);
 	}
+	public void setEqualWeight(boolean ew){equalWeight=ew;}
+	
 	public void saveImg(String name, File outDir)
 	{
 		BufferedImage image = null;
@@ -135,201 +136,97 @@ public class DrawHex extends JPanel
 			mini.blueWeight=0;
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file1);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+		BEDReader reader;
+		try {
+			
+			//File 1
+			reader = new BEDReader(file1);
+		
+			while(reader.hasNext())
 			{
-				chr = wholes[col];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				double count = 0;
+				
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
+
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
 					dataPoints.get(i).myMini.weight += weight;
 				}
 			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
+			
+			//File 2
+			reader = new BEDReader(file2);
+			
+			while(reader.hasNext())
 			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				locus1 = Integer.parseInt(wholes[col].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< dataPoints.size(); i++)
-				{
-					if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-					{
-						dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-						dataPoints.get(i).myMini.weight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				double count = 0;
 				
-				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-					dataPoints.get(i).myMini.weight += weight;
-				}
-			}
-		}
-		strings.removeAll(strings);
-		strings = inputRead(file2);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
-			{
-				chr = wholes[col];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr)&& dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
+
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					dataPoints.get(i).myMini.blueCounting.add(dataPoints.get(i));
 					dataPoints.get(i).myMini.blueWeight += weight;
 				}
 			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				locus1 = Integer.parseInt(wholes[col].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< dataPoints.size(); i++)
-				{
-					if(dataPoints.get(i).chrome.contentEquals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-					{
-						dataPoints.get(i).myMini.blueCounting.add(dataPoints.get(i));
-						dataPoints.get(i).myMini.blueWeight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				
-				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.contentEquals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					dataPoints.get(i).myMini.blueCounting.add(dataPoints.get(i));
-					dataPoints.get(i).myMini.blueWeight += weight;
-				}
-			}
+			
+			multiHeatMapping();
+			gini();
+			//degreesOfSep();
+			repaint();
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		multiHeatMapping();
-		gini();
-		//degreesOfSep();
-		repaint();
 	}
 	public void search(File file)
 	{
@@ -340,105 +237,55 @@ public class DrawHex extends JPanel
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
+		
+			while(reader.hasNext())
 			{
-				chr = wholes[col];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-					dataPoints.get(i).myMini.weight += weight;
-				}
-			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				locus1 = Integer.parseInt(wholes[col].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< dataPoints.size(); i++)
-				{
-					if(dataPoints.get(i).chrome.contentEquals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-					{
-						dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-						dataPoints.get(i).myMini.weight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
+				double count = 0;
 				
-				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.contentEquals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
+
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
 					dataPoints.get(i).myMini.weight += weight;
 				}
 			}
+			
+			heatMapping();
+			gini();
+			degreesOfSep();
+			repaint();
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		heatMapping();
-		gini();
-		degreesOfSep();
-		repaint();
 	}
 	public void search(File file, int locCol, int weightCol)
 	{
@@ -449,107 +296,55 @@ public class DrawHex extends JPanel
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
-			{
-				chr = wholes[col];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-					dataPoints.get(i).myMini.weight += weight;
-				}
-			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				locus1 = Integer.parseInt(wholes[locCol].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< dataPoints.size(); i++)
-				{
-					if(dataPoints.get(i).chrome.contentEquals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-					{
-						//System.out.println(chr + " " + locus + "  " + i);
-						dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-						dataPoints.get(i).myMini.weight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[locCol].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				
-				String loc1 = wholes[locCol].substring(wholes[locCol].indexOf(":")+1, wholes[locCol].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[locCol].substring(wholes[locCol].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-					dataPoints.get(i).myMini.weight += weight;
-				}
-			}
-		}
-		heatMapping();
-		gini();
-		degreesOfSep();
-		repaint();
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
 		
+			while(reader.hasNext())
+			{
+				Region reg = reader.next();
+				double weight;
+				if(equalWeight)
+					weight = 1.0;
+				else
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
+				ArrayList<Integer> inds = new ArrayList<Integer>();
+				double count = 0;
+				
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
+				}
+
+				if(!equalWeight)
+					weight/=count;
+				
+				for(Integer i: inds){
+					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
+					dataPoints.get(i).myMini.weight += weight;
+				}
+			}
+		
+			heatMapping();
+			gini();
+			degreesOfSep();
+			repaint();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public void gini()
 	{
@@ -576,7 +371,6 @@ public class DrawHex extends JPanel
 		{
 			uETotalWealth += i*unequal[i];
 		}
-		//System.out.println("draw unequal " +uETotalWealth);
 		double[] uECumPop = new double[maxDataPoints+1];
 		double[] uECumWealth = new double[maxDataPoints+1];
 		uECumPop[0] = unequal[0]/nodeList.size();
@@ -606,7 +400,6 @@ public class DrawHex extends JPanel
 		{
 			eQTotalWealth += i*equal[i];
 		}
-		//System.out.println("draw equal " +eQTotalWealth);
 		double[] eQCumPop = new double[mdp+1];
 		double[] eQCumWealth = new double[mdp+1];
 		eQCumPop[0] = equal[0]/nodeList.size();
@@ -674,7 +467,6 @@ public class DrawHex extends JPanel
 				else if (mini.bins.get(j).chrome.contentEquals(chr))
 					mini.counting.add(mini.bins.get(j));
 			}
-			//System.out.println(mini.counting.size());
 		}
 	    maxDataPoints = 0;
 	    minDataPoints = 0;
@@ -693,7 +485,6 @@ public class DrawHex extends JPanel
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
 			int yo = Integer.parseInt(sizer.substring(sizer.indexOf("x")+1,sizer.length()));
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNext())
 			{
@@ -726,17 +517,15 @@ public class DrawHex extends JPanel
 				dataPoints.add(nodeList.get(i).bins.get(j));
 			}
 		}
-		//System.out.println(dataPoints.size());
 		nodeSystem = new MiniSystem(nodeList,xNodes,yNodes);
 	}
 	public void paintComponent(Graphics g)
 	  {
 	    super.paintComponent(g);
-	    //colorBar(g);
+	    colorBar(g);
 	    //setBackground(Color.BLUE);
 	    
 //	    int centerNode = 2450;
-//	    System.out.println(centerNode);
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
 //		 	//For determining if neighbor Distance is working	    	
@@ -904,8 +693,6 @@ public class DrawHex extends JPanel
 				
 				double ddd = hexDist(xCoordA, yCoordA, xCoordB, yCoordB);
 				dist[i][j] = ddd;
-//				if(Math.random()<=.0001)
-//					System.out.println("(" + xCoordA+ ", " + yCoordA+ ")   ->   ("  +xCoordB + ", " +  yCoordB +")  = " + ddd);
 			}
 		}
 			double count = 0;
@@ -920,14 +707,6 @@ public class DrawHex extends JPanel
 			sepp /= count;
 			sep = sepp;
 			
-		/*for(int i = 0; i<nodes; i++)
-		{
-			for(int j = 0; j<nodes; j++)
-			{
-				System.out.print(dist[i][j] + "\t");
-			}
-			System.out.println("\n \n");
-		}*/
 	}
 	public int hexDist(int x1, int y1, int x2, int y2)
 	{
@@ -967,7 +746,6 @@ public class DrawHex extends JPanel
 				if(!right && y1%2 == 0)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 				else if(!right && y1%2 == 1)
 				{
@@ -980,12 +758,10 @@ public class DrawHex extends JPanel
 				else //if(right && y1%2 == 1)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 			}
 			else
 				cm = (int) Math.min(hm, ((((double)vm)/2)));
-			//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + "right? " + right + "     " + (hm) + " + " + vm + " - " + cm + "  ===   " + (hm + vm -cm));
 			return hm+vm-cm; 
 		}
 	}
@@ -1000,23 +776,25 @@ public class DrawHex extends JPanel
 //			colors.add(c);
 //		}
 //	}
-//	public void colorBar(Graphics g)
-//	{
-//		g.drawRect((int)(getWidth()*.2), (int)(getHeight()*.96), (int)(getWidth()*.55), (int)(getHeight()*.02));
-//		g.setColor(Color.BLACK);
-//		g.drawString(""+minDataPoints, (int)(getWidth()*.17),(int)(getHeight()*.95));
-//		g.drawString(""+maxDataPoints, (int)(getWidth()*.2+(int)(getWidth()*.55)),(int)(getHeight()*.95));
-//		for(int k = 0; k<colorNum;k++)
-//		{
-//			int red = 255;//(int)(k*255/colorNum);
-//			int blue = (int)(255-(k*255/colorNum));
-//			int green = (int)(255-(k*255/colorNum));
-//			Color c = new Color(red, green, blue);
-//			g.setColor(c);
-//			g.fillRect((int)(getWidth()*.2+((k*getWidth()*.55)/colorNum)),(int)(getHeight()*.96),(int)(getWidth()*.55/colorNum)+3,(int)(getHeight()*.02));
-//		}
-//		
-//	}
+	public void colorBar(Graphics g)
+	{
+		Graphics2D g2d = (Graphics2D)g;
+		int x = (int)(getWidth()*.2);
+		int y = (int)(getHeight()*.96);
+		int width = (int)(getWidth()*.55);
+		int height = (int)(getHeight()*.02);
+		
+		GradientPaint colorbar = new GradientPaint(x, y, Color.white, x+width, y, Color.RED, false);
+		g2d.setPaint(colorbar);
+		g2d.fillRect(x, y, width, height);
+		
+		g2d.setPaint(Color.black);
+		g2d.setColor(Color.BLACK);
+		g2d.drawRect(x, y, width, height);
+		g2d.drawString(""+minDataPoints, (int)(getWidth()*.17),(int)(getHeight()*.95));
+		g2d.drawString(""+maxDataPoints, (int)(getWidth()*.2+(int)(getWidth()*.55)),(int)(getHeight()*.95));
+		
+	}
 	public void heatMapping()
 	{
 		minDataPoints = 0;
@@ -1046,7 +824,6 @@ public class DrawHex extends JPanel
 //				MiniNode p = nodeList.get(i);
 //				double d = p.counting.size()*p.weight/b;
 //				double doop = maxDataPoints;
-//				//System.out.println(b + " " + doop + " "+d + " " + i);
 //				p.color = new Color(255, (int)(255-(d*255/doop)),(int)(255-d*255/doop));
 //			}
 //		}
@@ -1102,7 +879,6 @@ public class DrawHex extends JPanel
 		if(weighting == true && equalWeight==false)
 		{
 
-			System.out.println(nodeList.size());
 			maxDataPoints = (int) (nodeList.get(0).counting.size() * nodeList.get(0).weight);
 			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size() * nodeList.get(0).blueWeight);
 
@@ -1126,7 +902,6 @@ public class DrawHex extends JPanel
 				bl/=bloop;
 				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
 				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
-				//System.out.println(255*redRat*(d/doop) + "\t" + 255*blueRat*(bl/bloop));
 				p.color = new Color(255,0, 0, (int)(255*redRat));
 				p.color2 = new Color(0,0,255,(int)(255*blueRat));
 			
@@ -1136,7 +911,6 @@ public class DrawHex extends JPanel
 		}
 		else
 		{
-			System.out.println(nodeList.size());
 			maxDataPoints = (int) (nodeList.get(0).counting.size());
 			int maxBlueDataPoints = (int) (nodeList.get(0).blueCounting.size());
 			for(int i = 0; i<nodeList.size(); i++)
@@ -1159,7 +933,6 @@ public class DrawHex extends JPanel
 				bl/=bloop;
 				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
 				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
-				//System.out.println(255*redRat*(d/doop) + "\t" + 255*blueRat*(bl/bloop));
 				p.color = new Color(255,0, 0, (int)(255*redRat));
 				p.color2 = new Color(0,0,255,(int)(255*blueRat));
 			

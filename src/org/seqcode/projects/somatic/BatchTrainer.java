@@ -110,7 +110,6 @@ public class BatchTrainer extends JFrame
  	    	    int returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
  	    	    	trained = chooser.getSelectedFile();
- 	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
  	    	if(d != null && trained !=null)
  	    		d.search(trained);
@@ -131,7 +130,6 @@ public class BatchTrainer extends JFrame
  	    	    int returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
  	    	    	trained = chooser.getSelectedFile();
- 	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
  	    	    //Execute when search is pressed
  	    		chooser = new JFileChooser();
@@ -142,7 +140,6 @@ public class BatchTrainer extends JFrame
  	    	    returnVal = chooser.showOpenDialog(window2);
  	    	    if(returnVal == JFileChooser.APPROVE_OPTION) {
  	    	    	trained2 = chooser.getSelectedFile();
- 	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
  	    	    }
  	    	if(d != null && trained!=null && trained2!=null)
  	    		d.multiSearch(trained, trained2);
@@ -160,8 +157,6 @@ public class BatchTrainer extends JFrame
 	 }
 	 public static void main(String[] args)
 	  {
-		 //to view: args = "view"
-	    	
 	    	
 	    	if(args[0].equalsIgnoreCase("view"))
 	    	{
@@ -169,27 +164,20 @@ public class BatchTrainer extends JFrame
 
 	    	    String trained = "";
 	    		JFileChooser chooser = new JFileChooser();
-	    		System.out.println("1");
 	    	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
 	    	        "TXT files", "txt");
-	    	    System.out.println("2");
 	    	    chooser.setFileFilter(filter);
-	    	    System.out.println("3");
 	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-	    	    System.out.println("4");
 	    	    chooser.setVisible(true);
 	    	    int returnVal = chooser.showOpenDialog(window2);
 	    	    if(returnVal == JFileChooser.APPROVE_OPTION) 
 	    	    {
 	    	    	trained = chooser.getSelectedFile().getPath();
-	    	    	//System.out.println("You chose to open this file: " +chooser.getSelectedFile().getName());
 	    	    }
 	    	    else if(returnVal != JFileChooser.CANCEL_OPTION)
 	    	    {
-	    	    	System.out.println("okay, nevermind");
 	    	    	return;
 	    	    }
-	    	    System.out.println("6");
 	    	    JMenuBar menubar = new JMenuBar();
 	    	    window2.setJMenuBar(menubar);
 	    	    try
@@ -214,6 +202,7 @@ public class BatchTrainer extends JFrame
 	    	}
 	    	if(args[0].equalsIgnoreCase("use"))
 	    	{
+	    		System.setProperty("java.awt.headless", "true");
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
 	    		UseMap u = new UseMap(mapFileName, searchFiles, args[6], Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1,Integer.parseInt(args[4])==-1 );

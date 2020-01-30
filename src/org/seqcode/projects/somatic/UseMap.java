@@ -24,11 +24,11 @@ public class UseMap
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<File> searchers;
 	public MiniSystem nodeSystem;
-	public boolean weighting, showPVal, addToOldFile, pics, equalWeight;
+	public boolean  showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
 	public double[] sep;
 	
-	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean weightin)
+	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean equalWeighting)
 	{
 		pics = pic;
 		mapper = map;
@@ -40,30 +40,30 @@ public class UseMap
 		pValnVal= 1000;
 		showPVal = true;
 		gini=0;
-		weighting = true;
 		String mapp = map;
-		equalWeight = weightin;
+		equalWeight = equalWeighting;
 		yNodes=0;
 		xNodes=0;
 		searchers = new ArrayList<File>();
 		mapReader(mapp);
 		pVal = 0;
 		binSize = bins.get(0).maxLocus - bins.get(0).minLocus;
-		System.out.println("Analyzing files in "+folder.getAbsolutePath());
+		try {
+			System.out.println("Analyzing files in "+folder.getCanonicalPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		File[] listOfFiles = folder.listFiles();
 
 		for (File file : listOfFiles) 
 		{
-		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1 || file.getName().indexOf(".peaks")!=-1 || file.getName().indexOf(".narrowpeaks")!=-1)|| file.getName().indexOf(".bed")!=-1) 
+		    if (file.isFile() && file.getName().indexOf(".bed")!=-1) 
 		    {
 		    	searchers.add(file);
 		    }
 		}
 		nodes = yNodes*xNodes;
-		for(int i = 0; i < searchers.size(); i++)
-		{
-			System.out.println(searchers.get(i));
-		}
+		
 		heatMapping();
 	}
 	public void searchSystemDouble()
@@ -72,6 +72,7 @@ public class UseMap
 		{
 			outDir.mkdir();
 			d = new DrawHex(mapper);
+			d.setEqualWeight(equalWeight);
 			d.nodeBuild(2000,2000);
 	    	d.heatMapping();
 	    	d.countingDPS(null);
@@ -84,6 +85,7 @@ public class UseMap
 			for(int j = i; j < searchers.size(); j++)
 			{
 				g = new double[nodes+2][pValnVal+1];
+				for(int x=0; x<nodes+2; x++) { for(int y=0; y<=pValnVal; y++) {g[x][y]=0;} } 
 				gini = 0;
 				sep = new double[pValnVal+1];
 				multiSearch(searchers.get(i), searchers.get(j));
@@ -99,6 +101,7 @@ public class UseMap
 		{
 			outDir.mkdir();
 			d = new DrawHex(mapper);
+			d.setEqualWeight(equalWeight);
 			d.nodeBuild(2000,2000);
 	    	//d.colors();
 	    	d.heatMapping();
@@ -109,11 +112,13 @@ public class UseMap
 		writer.add("File\tgini\tginiW/WeightedBaseline(n="+pValnVal+")\tzScore");
 		for (File s:searchers)
 		{
-			g = new double[nodes+2][pValnVal+1];
+			System.out.println(s.getName());
+			g = new double[nodes+2][pValnVal+1]; 
+			for(int x=0; x<nodes+2; x++) { for(int y=0; y<=pValnVal; y++) {g[x][y]=0;} }
 			gini = 0;
 			sep = new double[pValnVal+1];
 			search(s);
-			writer.add(s + "\t" + g[nodes+1][0] +"\t" + g[nodes][0] + "\t" + g[nodes+1][1]);
+			writer.add(s.getName() + "\t" + g[nodes+1][0] +"\t" + g[nodes][0] + "\t" + g[nodes+1][1]);
 		}
 		writeFile(writer);
 		System.out.println("done");
@@ -176,17 +181,20 @@ public class UseMap
 								}
 							}
 				}
-				if(showPVal)
-				{
-					for(int p = 1; p<g[0].length; p++)
-					{
-						int ree = (int) (Math.random()*bins.size());
-						ree = nodeList.indexOf(bins.get(ree).myMini);
-						g[ree][p] += weight;
-					}
-				}
+				
 				if(!equalWeight)
 					weight/=count;
+				
+				if(showPVal){
+					for(int p = 1; p<g[0].length; p++){
+						for(int z=0; z<count; z++){
+							int ree = (int) (Math.random()*bins.size());
+							ree = nodeList.indexOf(bins.get(ree).myMini);
+							g[ree][p] += weight;
+						}
+					}
+				}
+				
 				for(Integer i: inds)
 				{
 					bins.get(i).myMini.counting.add(bins.get(i));
@@ -312,15 +320,9 @@ public class UseMap
 			if(vm %2 !=0)
 			{
 				if(!right && y1%2 == 0)
-				{
 					cm = Math.min(hm, (int)(((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
-				}
 				else if(right && y1%2 == 1)
-				{
 					cm = Math.min(hm, (int)(((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
-				}
 			}
 			else
 				cm = Math.min(hm, (int)(((double)vm)/2));
@@ -350,8 +352,8 @@ public class UseMap
 			for(int i=0; i<equal.length; i++)
 			{
 
-				if(num==1 && equal[i]>0)
-					System.out.println(i+"\t"+equal[i]);
+				//if(num==1 && equal[i]>0)
+				//	System.out.println(i+"\t"+equal[i]);
 				eQTotalWealth += i*equal[i];
 			}
 			
@@ -372,13 +374,11 @@ public class UseMap
 				eArea += (((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i])+((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i+1]))/2;
 			}
 		}
-		eArea /= pValnVal;
-		//System.out.println(eArea);
-		
+		eArea /= pValnVal;		
 		
 		//inequality
 		double maxWeight = 0;
-		for(int j =0; j<g.length; j++)
+		for(int j =0; j<nodeList.size(); j++)
 		{
 			if(g[j][0] > maxWeight)
 				maxWeight=g[j][0];
@@ -389,7 +389,7 @@ public class UseMap
 		**/
 		
 		int[] unequal = new int[(int)maxWeight+1];
-		for(int i1=0; i1<g.length-1; i1++)
+		for(int i1=0; i1<nodeList.size(); i1++)
 		{
 			int o = (int)g[i1][0];
 			unequal[o] ++;
@@ -445,11 +445,7 @@ public class UseMap
 		
 		int eQTotalWealth = 0;
 		for(int i=0; i<equal.length; i++)
-		{
 			eQTotalWealth += i*equal[i];
-		}
-		//System.out.println("use equal "+ eQTotalWealth);
-		
 		
 		double[] eQCumPop = new double[mdp+1];
 		double[] eQCumWealth = new double[mdp+1];
@@ -463,24 +459,20 @@ public class UseMap
 		//Equaliy area
 		double eArea = 0;
 		for(int i=0; i<equal.length-1; i++)
-		{
 			eArea += (((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i])+((eQCumPop[i+1]-eQCumPop[i])*eQCumWealth[i+1]))/2 ;
-		}
 		
 		//inequality
 		double maxWeight = 0;
-		for(int j =0; j<g.length; j++)
-		{
+		for(int j =0; j<nodeList.size(); j++)
 			if(g[j][0] > maxWeight)
 				maxWeight=g[j][0];
-		}
 		
 		/**
 		//casting weights to ints may put all to zero in some data types?
 		**/
 		
 		int[] unequal = new int[(int)maxWeight+1];
-		for(int i1=0; i1<g.length-1; i1++)
+		for(int i1=0; i1<nodeList.size(); i1++)
 		{
 			int o = (int)g[i1][0];
 			unequal[o] ++;
@@ -494,9 +486,6 @@ public class UseMap
 				//System.out.println("unequal:" + unequal[i1]);
 			uETotalWealth += i1*unequal[i1];
 		}
-		//System.out.println("use unequal "+ uETotalWealth);
-		
-		//System.out.println(uETotalWealth);
 
 		double[] uECumPop = new double[unequal.length];
 		double[] uECumWealth = new double[unequal.length];
@@ -535,7 +524,6 @@ public class UseMap
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
 			int yo = Integer.parseInt(sizer.substring(sizer.indexOf("x")+1,sizer.length()));
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNext())
 			{
@@ -569,7 +557,6 @@ public class UseMap
 				bins.add(nodeList.get(i).bins.get(j));
 			}
 		}
-		//System.out.println(dataPoints.size());
 		nodeSystem = new MiniSystem(nodeList,xNodes,yNodes);
 	}
 	
@@ -593,9 +580,9 @@ public class UseMap
 		{
 			FileWriter ff;
 			if(pics)
-				ff = new FileWriter(outDir+ "/"+"Lorenz_analysis.txt",true);       //File Naming System needed
+				ff = new FileWriter(outDir+ "/"+"lorenz_analysis.txt",false);  
 			else
-				ff = new FileWriter("Lorenz_Analysis.txt",true);
+				ff = new FileWriter("lorenz_analysis.txt",false);
 			b = new BufferedWriter(ff);
 			PrintWriter printer = new PrintWriter(b);
 			for(int i = 0; i< writer.size(); i++)
@@ -607,7 +594,6 @@ public class UseMap
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-			System.out.print("no way");
 		}
 	}
 }

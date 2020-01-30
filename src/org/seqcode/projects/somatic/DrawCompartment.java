@@ -32,7 +32,8 @@ public class DrawCompartment extends JPanel
 	public String fold, mapper, der;
 	public int maxBins, minBins, pValnVal, locCol, weightCol;
 	public ArrayList<DataPoint> bins;
-	public ArrayList<String> searchers,compNames;
+	public ArrayList<String> compNames;
+	public ArrayList<File> searchers;
 	public double[][] compCount;
 	public DrawCompartment(String s, String ss, boolean filesContainNodes)
 	{
@@ -59,7 +60,7 @@ public class DrawCompartment extends JPanel
     	equalWeight = true;
     	String mapp = map;
     	
-    	searchers = new ArrayList<String>();
+    	searchers = new ArrayList<File>();
     	compNames = new ArrayList<String>();
     	mapReader(mapp);
 		File folder = new File(directory);
@@ -69,7 +70,7 @@ public class DrawCompartment extends JPanel
 		{
 		    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1)) 
 		    {
-		    	searchers.add(file.getPath());
+		    	searchers.add(file);
 		    	compNames.add(file.getName());
 		    }
 		}
@@ -79,8 +80,8 @@ public class DrawCompartment extends JPanel
 			compCount = new double[nodes][searchers.size()];
 			for(int i = 0; i < searchers.size(); i++)
 			{
+				System.out.println(searchers.get(i).getName());
 				search(searchers.get(i), i);
-				System.out.println(searchers.get(i));
 			}
 		}
 		else
@@ -96,9 +97,8 @@ public class DrawCompartment extends JPanel
 				searchNodes(searchers.get(i),i);
 			}
 		}
-    	//System.out.println(binSize);
 	}
-	public void searchNodes(String s, int ind)
+	public void searchNodes(File s, int ind)
 	{
 		ArrayList<String> strings = inputRead(s);
 		for(String whole: strings)
@@ -145,7 +145,6 @@ public class DrawCompartment extends JPanel
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
 			int yo = Integer.parseInt(sizer.substring(sizer.indexOf("x")+1,sizer.length()));
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNext())
 			{
@@ -168,7 +167,7 @@ public class DrawCompartment extends JPanel
 		}
 		repaint();
 	}
-	public void search(String file, int ind)
+	public void search(File file, int ind)
 	{
 		for(int i = 0; i < nodeSystem.size(); i++)
 		{
@@ -176,55 +175,55 @@ public class DrawCompartment extends JPanel
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
+		
+			while(reader.hasNext())
 			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				
-				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("-")+1));
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				double count = 0;
+				
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
+
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
 					dataPoints.get(i).myMini.weight += weight;
 				}
 			}
-		}
-		for(int i = 0; i < nodeSystem.size(); i++)
-		{
-			compCount[i][ind] = nodeSystem.get(i).weight;
+			for(int i = 0; i < nodeSystem.size(); i++)
+			{
+				compCount[i][ind] = nodeSystem.get(i).weight;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	public void search(String file, int locCol, int weightCol)
+	public void search(File file)
 	{
 		multi = false;
 		for(int i = 0; i < nodeSystem.size(); i++)
@@ -233,76 +232,55 @@ public class DrawCompartment extends JPanel
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[locCol].contains("-") && !whole.contains("_"))
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
+		
+			while(reader.hasNext())
 			{
-				weighting = true;
-				chr = wholes[locCol].split(":")[0];
-				locus1 = Integer.parseInt(wholes[locCol].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< dataPoints.size(); i++)
-				{
-					if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-					{
-						//System.out.println(chr + " " + locus + "  " + i);
-						dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
-						dataPoints.get(i).myMini.weight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[locCol].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[locCol].split(":")[0];
-				
-				String loc1 = wholes[locCol].substring(wholes[locCol].indexOf(":")+1, wholes[locCol].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[locCol].substring(wholes[locCol].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[weightCol]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< dataPoints.size(); i++)
-					{
-						if(dataPoints.get(i).chrome.equals(chr) && dataPoints.get(i).minLocus <= locus && dataPoints.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				double count = 0;
+				
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< dataPoints.size(); i++){
+					//Overlap assessment 
+					if(dataPoints.get(i).chrome.equals(reg.chr) && 
+							((dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.start) ||
+							(reg.start <= dataPoints.get(i).minLocus && reg.end >= dataPoints.get(i).minLocus )) ){
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(dataPoints.get(i).chrome.equals(reg.chr) && 
+										(dataPoints.get(i).minLocus <= reg.start && dataPoints.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
+
+				if(!equalWeight)
+					weight/=count;
 				for(Integer i: inds)
 				{
 					dataPoints.get(i).myMini.counting.add(dataPoints.get(i));
 					dataPoints.get(i).myMini.weight += weight;
 				}
 			}
+			
+			heatMapping();
+			repaint();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		heatMapping();
-		repaint();
-		
 	}
 	
-	public ArrayList<String> inputRead(String file)
+	public ArrayList<String> inputRead(File file)
 	{
 		ArrayList<String> StringMat = new ArrayList<String>();
 		try 
@@ -310,7 +288,6 @@ public class DrawCompartment extends JPanel
 			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(file));
 			in.next();
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNextLine())
 			{
@@ -330,18 +307,11 @@ public class DrawCompartment extends JPanel
 			mini.counting.clear();
 			for(int j =0; j<mini.bins.size(); j++)
 			{
-				//if(chr <= -1)
-				//{
-				//	if(Math.random()>.9)
-				//		mini.counting.add(mini.bins.get(j));
-				//}
-				//else 
 				if (chr == null)
 					mini.counting.add(mini.bins.get(j));
 				else if (mini.bins.get(j).chrome.equals(chr))
 					mini.counting.add(mini.bins.get(j));
 			}
-			//System.out.println(mini.counting.size());
 		}
 	    maxDataPoints = 0;
 	    minDataPoints = 0;
@@ -358,7 +328,6 @@ public class DrawCompartment extends JPanel
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
 			int yo = Integer.parseInt(sizer.substring(sizer.indexOf("x")+1,sizer.length()));
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNext())
 			{
@@ -391,7 +360,6 @@ public class DrawCompartment extends JPanel
 				dataPoints.add(nodeList.get(i).bins.get(j));
 			}
 		}
-		//System.out.println(dataPoints.size());
 		nodeSystem = new MiniSystem(nodeList,xNodes,yNodes);
 	}
 	public void paintComponent(Graphics g)
@@ -401,7 +369,6 @@ public class DrawCompartment extends JPanel
 	    setBackground(Color.GRAY);
 	    
 //	    int centerNode = 2450;
-//	    System.out.println(centerNode);
 	    for(int i = 0; i<nodeList.size(); i++)
 	    {	
 	    	g.setColor(nodeList.get(i).color);
@@ -520,30 +487,19 @@ public class DrawCompartment extends JPanel
 				
 				double ddd = hexDist(xCoordA, yCoordA, xCoordB, yCoordB);
 				dist[i][j] = ddd;
-//				if(Math.random()<=.0001)
-//					System.out.println("(" + xCoordA+ ", " + yCoordA+ ")   ->   ("  +xCoordB + ", " +  yCoordB +")  = " + ddd);
 			}
 		}
-			double count = 0;
-			for(int j = 0; j<nodes; j++)
-			{
-				for(int k = 0; k<nodes; k++)
-				{
-					sepp += dist[j][k]*(nodeList.get(k).counting.size())*(nodeList.get(j).counting.size());
-					count+= nodeList.get(k).counting.size()*(nodeList.get(j).counting.size());
-				}
-			}
-			sepp /= count;
-			sep = sepp;
-			
-		/*for(int i = 0; i<nodes; i++)
+		double count = 0;
+		for(int j = 0; j<nodes; j++)
 		{
-			for(int j = 0; j<nodes; j++)
+			for(int k = 0; k<nodes; k++)
 			{
-				System.out.print(dist[i][j] + "\t");
+				sepp += dist[j][k]*(nodeList.get(k).counting.size())*(nodeList.get(j).counting.size());
+				count+= nodeList.get(k).counting.size()*(nodeList.get(j).counting.size());
 			}
-			System.out.println("\n \n");
-		}*/
+		}
+		sepp /= count;
+		sep = sepp;
 	}
 	public int hexDist(int x1, int y1, int x2, int y2)
 	{
@@ -583,7 +539,6 @@ public class DrawCompartment extends JPanel
 				if(!right && y1%2 == 0)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 				else if(!right && y1%2 == 1)
 				{
@@ -596,12 +551,10 @@ public class DrawCompartment extends JPanel
 				else //if(right && y1%2 == 1)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 			}
 			else
 				cm = (int) Math.min(hm, ((((double)vm)/2)));
-			//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + "right? " + right + "     " + (hm) + " + " + vm + " - " + cm + "  ===   " + (hm + vm -cm));
 			return hm+vm-cm; 
 		}
 	}

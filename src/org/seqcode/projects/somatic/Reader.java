@@ -56,7 +56,6 @@ public class Reader
 		if(s !=null &&s.indexOf("\t")!=-1 &&!s.substring(0, s.indexOf("\t")).isEmpty())
 		{
 			count++;
-			//System.out.println(s);
 			DataPoint p = new DataPoint(); p.setName(s.substring(0,s.indexOf("\t")));
 			s = s.substring(s.indexOf("\t")+1,s.length());
 			

@@ -68,7 +68,6 @@ public class ThreadMap
 			super();
 			thisT = i;
 			partOfNeighbors = new double[threadLims[i][3]-threadLims[i][2]+1][nodes[0].length];
-			//System.out.println("   "+ (threadLims[i][3]-threadLims[i][2])+"  " +nodes[0].length);
 		}
 		public void run()
 		{
@@ -102,7 +101,6 @@ public class ThreadMap
 				{
 					numVec[l] = numVec[l]/sumDenom;
 				}
-				//System.out.println( "   "+numVec.length);
 				partOfNeighbors[i-threadLims[thisT][2]] = numVec;								//Node vectors are updated in order, but reassignment happens after all are updated -> batched SOM
 			}
 		}		
@@ -116,7 +114,6 @@ public class ThreadMap
 		{
 			super();
 			thisT = i;
-			//System.out.println(nodeNum);
 			pp = new int[nodeNum];
 			pAssign = new boolean[threadLims[i][1]-threadLims[i][0]+1][nodeNum];
 		}
@@ -150,7 +147,6 @@ public class ThreadMap
 					}
 					if(initdist == 0)
 						System.err.print("error initdist==0");
-					//System.out.println(bestNode);
 					pAssign[i-threadLims[thisT][0]][bestNode] = true;
 					pp[bestNode]++;
 				}
@@ -168,7 +164,6 @@ public class ThreadMap
 					{
 						if(chr != dpChr[j])
 						{
-							//System.out.println(dpChr[j]+ "\t" + chr + "\t" + counter + "\t" + dp[i][j]);
 							dpSmall[counter] = dp[i][j];
 							counter++;
 						}
@@ -193,7 +188,6 @@ public class ThreadMap
 						{
 							if(chr != dpChr[k])
 							{
-								//System.out.println(dpChr[j]+ "\t" + chr + "\t" + county + "\t" + nodes[j][k]);
 								nodeSmall[county] = nodes[j][k];
 								county++;
 							} 
@@ -217,7 +211,6 @@ public class ThreadMap
 						
 						if(dist>initdist)  								//Node with highest cosine similarity value to data point = most similar
 						{
-							//System.out.println(dist);
 							initdist = dist;
 							bestNode = j;
 						}
@@ -226,7 +219,6 @@ public class ThreadMap
 					{
 						System.err.println("error: initdist<=0");
 					}
-					//System.out.println(bestNode);
 					pAssign[i-threadLims[thisT][0]][bestNode] = true;
 					pp[bestNode]++;
 				}
@@ -253,7 +245,6 @@ public class ThreadMap
 		for(int i = 0; i< points.size(); i++)
 		{
 			points.get(i).updateMag();
-			//System.out.println(points.get(i).name);
 			if(points.get(i).updateMag()==0)
 				badPoints.add(points.get(i));
 		}
@@ -307,7 +298,6 @@ public class ThreadMap
 	public void initialize() 
 	{
 		nodes = new double[nodeNum][dpSize];
-		//System.out.println(dp.length + "   " + nodes[0].length);
 		assignments = new boolean[dpSize][nodeNum];    							/** Be Careful, this has opposite i x j convention (dp by node instead of node by dp)*/
 		dpcount = new int[nodeNum];
 		nMag = new double[nodeNum];
@@ -323,7 +313,6 @@ public class ThreadMap
 		int curD=0;
 		for(int i = 0; i< threadNum; i++)
 		{
-			//System.out.println(curN + "     "+ curD);
 			threadLims[i][0]=curD;
 			curD += dpNum;
 			if(dpExtra > i)
@@ -336,20 +325,11 @@ public class ThreadMap
 				curN++;
 			threadLims[i][3]=curN;
 
-			//System.out.println(curN + "     "+ curD);
 			curN++;
 			curD++;
 		}
-		
-//		for(int i = 0; i< threadLims.length; i++)
-//		{
-//			System.out.println(threadLims[i][0] +"-" + threadLims[i][1]);
-//			System.out.println(threadLims[i][2] +"-" + threadLims[i][3]);
-//		}
-		//System.out.println("hey" + (nodes.length-1) + "    " +(dpSize) + "   " + nodes[0].length);
 		assignNeighbors();
 		assignNodes();
-		//System.out.println("Initialization Done");
 	}
 	//Assigns data points to nodes based on similarity metric
 	public void assignNodes()
@@ -408,19 +388,17 @@ public class ThreadMap
 		dot = dot/(magN*magD);
 		if(Double.isNaN(magN))
 		{
-			System.out.println("NaN  "+ magN + "   " + magD);
+			System.err.println("NaN  "+ magN + "   " + magD);
 			dot = 0;
 		}
 		
 		if(dot > 1 && dot< 1.0000001)
 	    	dot=1;
-	    if(dot>1.0000001)
-	    	System.out.println("whoops");
+	    
 		return dot;
 	}
 	public double cosineSim(double[] nodal, double[] datal, double magNode, double magData)
 	{
-		//System.out.println(nodal.length + "\t" + nodes[0].length + "\t" + datal.length + "\t" + dp[0].length);
 		double dot = 0;
 		double magN = magNode;
 		double magD = magData;
@@ -431,14 +409,12 @@ public class ThreadMap
 		dot = dot/(magN*magD);
 		if(Double.isNaN(magN))
 		{
-			System.out.println("NaN  "+ magN + "   " + magD);
+			System.err.println("NaN  "+ magN + "   " + magD);
 			dot = 0;
 		}
 		//System.out.println(dot);
 		if(dot > 1 && dot< 1.0000001)
 	    	dot=1;
-	    if(dot>1.0000001)
-	    	System.out.println("whoops");
 		return dot;
 	}
 	
@@ -476,9 +452,6 @@ public class ThreadMap
 	    double rr = cov / sigmax / sigmay;
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
-	    if(rr>1.0000001)
-	    	System.err.println("error rr>1");
-
 	    return rr;
 	}
 	
@@ -515,8 +488,6 @@ public class ThreadMap
 	    double rr = cov / (sigmax * sigmay);
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
-	    if(rr>1.0000001)
-	    	System.err.println("error rr>1");
 
 	    return rr;
 	}
@@ -549,7 +520,6 @@ public class ThreadMap
 			if(r>zero)
 				i++;
 		}
-		//System.out.println(i);
 		return i;
 	}
 	//Finds the weight factor of a given data point based on learning rate and neighborhood function
@@ -561,12 +531,10 @@ public class ThreadMap
 		double lrStop = 0.01;
 		double lr = 1-lrStop;
 		lr = (lr - (lr*(itercount/iterations)))+lrStop;
-		//System.out.println(lr);
 		for(double o = 0; o < weightsByHood.length; o++)
 		{
 			r = lr*Math.exp(-1*((o*o)/(2*sig*sig)));
 			weightsByHood[(int)o] = r;
-			//System.out.println(o + " " + sgm + " " + sgmStop + " " + sig +" "  + r);
 		}
 	}
 	//Where the magic happens
@@ -581,13 +549,11 @@ public class ThreadMap
 		}
 		for(Thread t : iThreads){try {t.join();} catch (InterruptedException e) {}}
 		
-		synchronized (this){//System.out.println("synchronizing");}
+		synchronized (this){
 		for(int i = 0; i < threadNum; i++)
 		{
-			//System.out.println(iThreads[i].partOfNeighbors.length);
 			for(int j = 0; j < iThreads[i].partOfNeighbors.length; j++)
 			{
-				//System.out.print(threadLims[i][2]+j  + "(" +j +")" + "\t");
 				nodes[threadLims[i][2]+j] = iThreads[i].partOfNeighbors[j];
 			}
 		}
@@ -602,7 +568,6 @@ public class ThreadMap
 	public void assignNeighbors() 								
 	{
 		neighborly = new int[nodeNum][nodeNum];
-		//System.out.println("Working " + yNodes + " " + xNodes);
 		for(int i = 0; i< nodeNum; i++)
 		{
 			int xA = i%xNodes;
@@ -628,7 +593,6 @@ public class ThreadMap
 		//writeFile();
 		findPearsonQuality();
 		findCosineQuality();
-		//System.out.println("Training done");
 	}
 	//Quality is defined as the average similarity between dataPoints and their assigned nodes 
 	public void findPearsonQuality()
@@ -641,11 +605,9 @@ public class ThreadMap
 				if(assignments[i][j])
 					pearsonQuality += pearson(j, i);
 			}
-			//System.out.println(quality);
 		}
 
 		pearsonQuality /= dpSize;
-		//System.out.println(pearsonQuality);
 	}
 	public void findCosineQuality()
 	{
@@ -657,11 +619,9 @@ public class ThreadMap
 				if(assignments[i][j])
 					cosineQuality += cosineSim(j, i);
 			}
-			//System.out.println(quality);
 		}
 		
 		cosineQuality /= dpSize;
-		//System.out.println(cosineQuality);
 	}
 	public Boolean findStability(int d, int p)
 	{
@@ -698,8 +658,6 @@ public class ThreadMap
 				
 				double ddd = hexDist(xCoordA, yCoordA, xCoordB, yCoordB);
 				dist[i][j] = ddd;
-//				if(Math.random()<=.0001)
-//					System.out.println("(" + xCoordA+ ", " + yCoordA+ ")   ->   ("  +xCoordB + ", " +  yCoordB +")  = " + ddd);
 			}
 		}
 			double count = 0;
@@ -712,17 +670,7 @@ public class ThreadMap
 				}
 			}
 			sepp /= count;
-			return sepp;
-			
-		/*for(int i = 0; i<nodes; i++)
-		{
-			for(int j = 0; j<nodes; j++)
-			{
-				System.out.print(dist[i][j] + "\t");
-			}
-			System.out.println("\n \n");
-		}*/
-		
+			return sepp;		
 	}
 	public int hexDist(int x1, int y1, int x2, int y2)
 	{
@@ -762,7 +710,6 @@ public class ThreadMap
 				if(!right && y1%2 == 0)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 				else if(!right && y1%2 == 1)
 				{
@@ -775,12 +722,10 @@ public class ThreadMap
 				else //if(right && y1%2 == 1)
 				{
 					cm = (int) Math.min(hm, (((double)vm)/2 +.5));
-					//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + (hm-cm+vm-cm+cm));
 				}
 			}
 			else
 				cm = (int) Math.min(hm, ((((double)vm)/2)));
-			//System.out.println("(" + x1+ ", " + y1+ ")   ->   ("  +x2 + ", " +  y2 +")  = " + "right? " + right + "     " + (hm) + " + " + vm + " - " + cm + "  ===   " + (hm + vm -cm));
 			return hm+vm-cm; 
 		}
 	}

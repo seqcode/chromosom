@@ -20,7 +20,8 @@ public class Correlations
 	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, locCol, weightCol, binSize;
 	public ArrayList<DataPoint> bins;
 	public ArrayList<MiniNode> nodeList;
-	public ArrayList<String> searchers,names;
+	public ArrayList<String> names;
+	public ArrayList<File> searchers;
 	public MiniSystem nodeSystem;
 	public boolean weighting, showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
@@ -40,7 +41,7 @@ public class Correlations
 		String mapp = map;
 		yNodes=0;
 		xNodes=0;
-		searchers = new ArrayList<String>();
+		searchers = new ArrayList<File>();
 		names = new ArrayList<String>();
 		mapReader(mapp);
 		pVal = 0;
@@ -51,18 +52,15 @@ public class Correlations
 			File[] listOfFiles = folder.listFiles();
 			for (File file : listOfFiles) 
 			{
-			    if (file.isFile() && (file.getName().indexOf(".txt") != -1 || file.getName().indexOf(".domains")!=-1 || file.getName().indexOf(".peaks")!=-1 || file.getName().indexOf(".narrowpeaks")!=-1)|| file.getName().indexOf(".bed")!=-1) 
+			    if (file.isFile() && file.getName().indexOf(".bed")!=-1) 
 			    {
-			    	searchers.add(file.getPath());
+			    	searchers.add(file);
 			    	names.add(file.getName());
 			    }
 			}
 		}
 		nodes = yNodes*xNodes;
-		for(int i = 0; i < searchers.size(); i++)
-		{
-			System.out.println(searchers.get(i));
-		}
+		
 		heatMapping();
 	}
 	public void searchSystem()
@@ -82,6 +80,7 @@ public class Correlations
 					correlations[i][j] = 1;
 				else
 				{
+					System.out.println(searchers.get(i).getName()+" vs. "+searchers.get(j).getName());
 					double[] array2 = new double[nodeList.size()];
 					search(searchers.get(j));
 					for(int k = 0; k<nodeList.size(); k++)
@@ -145,13 +144,12 @@ public class Correlations
 	    double rr = cov / sigmax / sigmay;
 	    if(rr > 1 && rr< 1.0000001)
 	    	rr=1;
-	    if(rr>1.0000001)
-	    	System.out.println("whoops");
+
 	    nodal = nnn;
 	    datal = ddd;
 	    return rr;
 	}
-	public void search(String file)
+	public void search(File file)
 	{
 		for(int i = 0; i < nodeSystem.size(); i++)
 		{
@@ -159,102 +157,50 @@ public class Correlations
 			mini.counting.clear();
 			mini.weight = 0;
 		}
-		int col = 0 ;
-		int www = 0;
-		ArrayList<String> strings = inputRead(file);
-		for(String whole: strings)
-		{
-			String chr;
-			int locus1 = 0; int locus2 = 0;
-			double weight = 0;
-			String[] wholes = whole.split("\t");
-			//System.out.println(whole);
-			if(whole.contains("\t") && !whole.contains(":") && whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_") )
+
+		BEDReader reader;
+		try {
+			reader = new BEDReader(file);
+		
+			while(reader.hasNext())
 			{
-				chr=wholes[col];
-				String loc1 = wholes[1];
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[2]);
+				Region reg = reader.next();
+				double weight;
 				if(equalWeight)
 					weight = 1.0;
 				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
+					weight = reg.score / 1000; //Note this use of the BED score definition in the manual. 
+					
 				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< bins.size(); i++)
-					{
-						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
-				}
-				weight/=count;
-				for(Integer i: inds)
-				{
-					bins.get(i).myMini.counting.add(bins.get(i));
-					bins.get(i).myMini.weight += weight;
-				}
-			}
-			else if(whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& !wholes[col].contains("-") && !whole.contains("_")&& !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[col].split(":")[0];
-				locus1 = Integer.parseInt(wholes[col].substring(whole.indexOf(":")+1));
-				//locus2 = Integer.parseInt(whole.substring(whole.indexOf("-")+1,whole.indexOf("\t")));
-				int locus = locus1;//(locus1 +locus2)/2;
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				for(int i = 0; i< bins.size(); i++)
-				{
-					if(bins.get(i).chrome.contentEquals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
-					{
-						bins.get(i).myMini.counting.add(bins.get(i));
-						bins.get(i).myMini.weight += weight;
-					}
-				}
-			}
-			else if (whole.contains("\t") && whole.contains(":")&&whole.contains("chr")&& wholes[col].contains("-") && !whole.contains("_") && !whole.substring(whole.indexOf("chr")+3,whole.indexOf(":")).equalsIgnoreCase("M"))
-			{
-				weighting = true;
-				chr = wholes[locCol].split(":")[0];
+				double count = 0;
 				
-				String loc1 = wholes[col].substring(wholes[col].indexOf(":")+1, wholes[col].indexOf("-"));
-				locus1 = Integer.parseInt(loc1);
-				locus2 = Integer.parseInt(wholes[col].substring(wholes[col].indexOf("-")+1));
-				if(equalWeight)
-					weight = 1.0;
-				else
-					weight = Double.parseDouble(wholes[www]);     											/** This needs to be taken as an argument somehow, not hard coded*/
-				int locus = locus1;
-				ArrayList<Integer> inds = new ArrayList<Integer>();
-				int count = 0;
-				while(locus<locus2)
-				{
-					for(int i = 0; i< bins.size(); i++)
-					{
-						if(bins.get(i).chrome.equals(chr) && bins.get(i).minLocus <= locus && bins.get(i).maxLocus>=locus)
-						{
-							count++;
-							inds.add(i);
-						}
-					}
-					locus+=binSize;
+				//Iterate over bins (datapoints in SOM)
+				for(int i = 0; i< bins.size(); i++){
+					//Overlap assessment 
+					if(bins.get(i).chrome.equals(reg.chr) && 
+							((bins.get(i).minLocus <= reg.start && bins.get(i).maxLocus >= reg.start) ||
+							(reg.start <= bins.get(i).minLocus && reg.end >= bins.get(i).minLocus )) )
+							{
+								count++;
+								inds.add(i);
+								
+								//Check for contained relationship to shortcut
+								if(bins.get(i).chrome.equals(reg.chr) && 
+										(bins.get(i).minLocus <= reg.start && bins.get(i).maxLocus >= reg.end) ) {
+									break;
+								}
+							}
 				}
-				weight/=count;
-				for(Integer i: inds)
-				{
+				
+				if(!equalWeight)
+					weight/=count;
+				for(Integer i: inds){
 					bins.get(i).myMini.counting.add(bins.get(i));
 					bins.get(i).myMini.weight += weight;
 				}
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	public String coClustering(String file1, String file2)
@@ -269,7 +215,6 @@ public class Correlations
 			@SuppressWarnings("resource")
 			Scanner in = new Scanner(new FileReader(file));
 			in.next();
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNextLine())
 			{
@@ -290,7 +235,6 @@ public class Correlations
 			String sizer = in.next();
 			int xo = Integer.parseInt(sizer.substring(0,sizer.indexOf("x")));
 			int yo = Integer.parseInt(sizer.substring(sizer.indexOf("x")+1,sizer.length()));
-			//System.out.println(xo + "  x  "+ yo);
 			in.next();
 			while(in.hasNext())
 			{
@@ -324,7 +268,6 @@ public class Correlations
 				bins.add(nodeList.get(i).bins.get(j));
 			}
 		}
-		//System.out.println(bins.size());
 		nodeSystem = new MiniSystem(nodeList,xNodes,yNodes);
 	}
 	
@@ -370,7 +313,6 @@ public class Correlations
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-			System.out.print("no way");
 		}
 	}
 }

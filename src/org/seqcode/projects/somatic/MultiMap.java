@@ -155,11 +155,10 @@ public class MultiMap extends JFrame
     	    ArrayList<ThreadMap> op = new ArrayList<ThreadMap>();
     	    for(int i = 0; i< n; i++)
     	    {
-        	    System.out.println("working");
+        	    System.out.println("training");
     	    	ThreadMap o = new ThreadMap(xArg,yArg, sig, sigStop, iter, Integer.parseInt(args[7]) , args[8], args[9], Integer.parseInt(args[10]), Integer.parseInt(args[11])==1);
    		 		o.go();
    		 		op.add(o);
-   		 		System.out.println(((double)(i+1))/((double)n));
     	    }
     	    boolean boo = Integer.parseInt(args[7]) == 1;
     	    qualityControl(op, boo).writeFile(n);

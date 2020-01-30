@@ -25,7 +25,6 @@ public class MiniNode
 		notCounting = new ArrayList<DataPoint>();
 		xCoord = Integer.parseInt(s.substring(s.indexOf("[")+1,s.indexOf(",")));
 		yCoord = Integer.parseInt(s.substring(s.indexOf(",")+1,s.indexOf("]")));
-		//System.out.println(xCoord +", "+yCoord);
 	}
 	public void addDP(String s)
 	{
