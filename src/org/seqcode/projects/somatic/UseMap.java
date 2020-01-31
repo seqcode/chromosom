@@ -1,4 +1,5 @@
 package org.seqcode.projects.somatic;
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,6 +28,7 @@ public class UseMap
 	public boolean  showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
 	public double[] sep;
+	public Color heatmapColorA=Color.red, heatmapColorB=Color.blue;
 	
 	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean equalWeighting)
 	{
@@ -57,7 +59,7 @@ public class UseMap
 
 		for (File file : listOfFiles) 
 		{
-		    if (file.isFile() && file.getName().indexOf(".bed")!=-1) 
+		    if (file.isFile() && file.getName().endsWith(".bed")) 
 		    {
 		    	searchers.add(file);
 		    }
@@ -66,12 +68,17 @@ public class UseMap
 		
 		heatMapping();
 	}
+	public void setColorA(Color c) {heatmapColorA=c;}
+	public void setColorB(Color c) {heatmapColorB=c;}
+	
 	public void searchSystemDouble()
 	{
 		if(pics)
 		{
 			outDir.mkdir();
 			d = new DrawHex(mapper);
+			d.setColorA(heatmapColorA);
+			d.setColorB(heatmapColorB);
 			d.setEqualWeight(equalWeight);
 			d.nodeBuild(2000,2000);
 	    	d.heatMapping();
@@ -82,14 +89,14 @@ public class UseMap
 		writer.add("File\tgini\tginiW/WeightedBaseline(n="+pValnVal+")\tzScore");
 		for (int i = 0; i < searchers.size()-1; i++)
 		{
-			for(int j = i; j < searchers.size(); j++)
+			for(int j = i+1; j < searchers.size(); j++)
 			{
 				g = new double[nodes+2][pValnVal+1];
 				for(int x=0; x<nodes+2; x++) { for(int y=0; y<=pValnVal; y++) {g[x][y]=0;} } 
 				gini = 0;
 				sep = new double[pValnVal+1];
 				multiSearch(searchers.get(i), searchers.get(j));
-				writer.add(searchers.get(i) + "_" + searchers.get(j) + coClustering(searchers.get(i), searchers.get(j)));
+				writer.add(searchers.get(i) + "_vs_" + searchers.get(j) + coClustering(searchers.get(i), searchers.get(j)));
 			}
 		}
 		writeFile(writer);
@@ -101,6 +108,8 @@ public class UseMap
 		{
 			outDir.mkdir();
 			d = new DrawHex(mapper);
+			d.setColorA(heatmapColorA);
+			d.setColorB(heatmapColorB);
 			d.setEqualWeight(equalWeight);
 			d.nodeBuild(2000,2000);
 	    	//d.colors();
@@ -127,10 +136,11 @@ public class UseMap
 	{
 		if(pics)
 		{
+			System.out.println(file1.getName()+" vs. "+file2.getName());
 			//d.search(fold+"/"+file, locCol, weightCol);
 			d.multiSearch(file1, file2);
 			d.repaint();
-			d.saveImg(file1.getName()+"_"+file2.getName(), outDir, 2000, 2000);
+			d.saveImg(file1.getName()+"_vs_"+file2.getName(), outDir, 2000, 2000);
 		}
 	}
 	public void search(File file)

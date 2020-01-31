@@ -52,7 +52,7 @@ public class Correlations
 			File[] listOfFiles = folder.listFiles();
 			for (File file : listOfFiles) 
 			{
-			    if (file.isFile() && file.getName().indexOf(".bed")!=-1) 
+			    if (file.isFile() && file.getName().endsWith(".bed")) 
 			    {
 			    	searchers.add(file);
 			    	names.add(file.getName());

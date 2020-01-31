@@ -21,14 +21,15 @@ public class DrawHex extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 	public double gini;
-	public int nodes,xs,ys,xNodes,yNodes, maxDataPoints, minDataPoints, colorNum, winW, winH, binSize;
+	public int nodes,xs,ys,xNodes,yNodes, maxDataPoints, minDataPoints, winW, winH, binSize;
 	public ArrayList<DataPoint> dataPoints;
 	public ArrayList<MiniNode> nodeList;
-	public ArrayList<Color> colors;
 	public MiniSystem nodeSystem;
 	public boolean multi, weighting, norm, equalWeight;
 	int swap, col, www, xMin, yMin, xMax, yMax, fontSize=10;
 	public double sep, cutoff;
+	public Color colorA=Color.red, colorB=Color.blue; //Colors for dataset A and dataset B (if plotting two colors) 
+	
 	public DrawHex(String s)
 	{
 		cutoff = 0.01;
@@ -43,8 +44,6 @@ public class DrawHex extends JPanel
 		xNodes=0;
 		reader(ffs);
 		nodes = yNodes*xNodes;
-    	colors = new ArrayList<Color>();
-    	colorNum=100;
     	binSize = dataPoints.get(0).maxLocus - dataPoints.get(0).minLocus;
     	col = 0;
     	www = 1;
@@ -64,14 +63,14 @@ public class DrawHex extends JPanel
 		xNodes=0;
 		reader(ffs);
 		nodes = yNodes*xNodes;
-    	colors = new ArrayList<Color>();
-    	colorNum=100;
     	binSize = dataPoints.get(0).maxLocus - dataPoints.get(0).minLocus;
     	col = colLoc;
     	www = weightLoc;
     	equalWeight = equalW;
 	}
 	public void setEqualWeight(boolean ew){equalWeight=ew;}
+	public void setColorA(Color c) {colorA=c;}
+	public void setColorB(Color c) {colorB=c;}
 	
 	public void saveImg(String name, File outDir)
 	{
@@ -784,7 +783,7 @@ public class DrawHex extends JPanel
 		int width = (int)(getWidth()*.55);
 		int height = (int)(getHeight()*.02);
 		
-		GradientPaint colorbar = new GradientPaint(x, y, Color.white, x+width, y, Color.RED, false);
+		GradientPaint colorbar = new GradientPaint(x, y, Color.white, x+width, y, colorA, false);
 		g2d.setPaint(colorbar);
 		g2d.fillRect(x, y, width, height);
 		
@@ -845,7 +844,7 @@ public class DrawHex extends JPanel
 				MiniNode p = nodeSystem.get(i);
 				double d = p.counting.size()*p.weight;
 				double doop = maxDataPoints;
-				p.color = new Color(255, 0,0,(int)(255*d/doop));
+				p.color = new Color(colorA.getRed(), colorA.getGreen(),colorA.getBlue(),(int)(255*d/doop));
 				if((swap == 1||swap == 3)&& p.counting.size()*p.weight<=cutoff*maxDataPoints)
 					p.color = Color.GRAY;
 			}
@@ -867,7 +866,7 @@ public class DrawHex extends JPanel
 				MiniNode p = nodeSystem.get(i);
 				double d = p.counting.size();
 				double doop = maxDataPoints;
-				p.color = new Color(255, 0,0,(int)(255*d/doop));
+				p.color = new Color(colorA.getRed(), colorA.getGreen(),colorA.getBlue(),(int)(255*d/doop));
 				if((swap == 1||swap == 3) && p.counting.size()==0)
 					p.color = Color.GRAY;
 			}
@@ -902,8 +901,8 @@ public class DrawHex extends JPanel
 				bl/=bloop;
 				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
 				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
-				p.color = new Color(255,0, 0, (int)(255*redRat));
-				p.color2 = new Color(0,0,255,(int)(255*blueRat));
+				p.color = new Color(colorA.getRed(), colorA.getGreen(),colorA.getBlue(), (int)(255*redRat));
+				p.color2 = new Color(colorB.getRed(), colorB.getGreen(),colorB.getBlue(),(int)(255*blueRat));
 			
 				if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)
 					p.color = Color.GRAY;
@@ -933,8 +932,8 @@ public class DrawHex extends JPanel
 				bl/=bloop;
 				double redRat = d*ratRat;//(d+(.7*bl))/1.7;
 				double blueRat = bl*(1-ratRat);//(bl+(.7*d))/1.7;
-				p.color = new Color(255,0, 0, (int)(255*redRat));
-				p.color2 = new Color(0,0,255,(int)(255*blueRat));
+				p.color = new Color(colorA.getRed(), colorA.getGreen(),colorA.getBlue(), (int)(255*redRat));
+				p.color2 = new Color(colorB.getRed(), colorB.getGreen(),colorB.getBlue(),(int)(255*blueRat));
 			
 				if((swap == 1||swap == 3) && p.counting.size()*p.weight<=cutoff*maxDataPoints && p.blueCounting.size()*p.blueWeight<=cutoff*maxBlueDataPoints)
 					p.color = Color.GRAY;

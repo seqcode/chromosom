@@ -1,5 +1,6 @@
 package org.seqcode.projects.somatic;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -206,6 +207,10 @@ public class BatchTrainer extends JFrame
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
 	    		UseMap u = new UseMap(mapFileName, searchFiles, args[6], Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1,Integer.parseInt(args[4])==-1 );
+	    		if(args.length>=8 && args[7].contentEquals("blue")) {
+	    			u.setColorA(Color.blue);
+	    			u.setColorB(Color.red);
+	    		}
 	    		u.searchSystem();
 	    	}
 	    	if(args[0].equalsIgnoreCase("compartments"))
@@ -221,6 +226,7 @@ public class BatchTrainer extends JFrame
 	    	}
 	    	if(args[0].equalsIgnoreCase("cor"))
 	    	{
+	    		System.setProperty("java.awt.headless", "true");
 	    		String map = args[1];
 	    		ArrayList<String> folders = new ArrayList<String>();
 	    		for(int i = 2; i<args.length; i++)
@@ -232,6 +238,7 @@ public class BatchTrainer extends JFrame
 	    	}
 	    	if(args[0].equalsIgnoreCase("pairwise"))
 	    	{
+	    		System.setProperty("java.awt.headless", "true");
 	    		String mapFileName = args[1];
 	    		String searchFiles = args[2];
 	    		UseMap u = new UseMap(mapFileName, searchFiles, args[6], Integer.parseInt(args[3]), Integer.parseInt(args[4]),Integer.parseInt(args[5])==1, Integer.parseInt(args[4])==-1);
