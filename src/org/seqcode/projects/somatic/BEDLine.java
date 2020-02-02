@@ -21,12 +21,12 @@ public class BEDLine {
 	public String getName() { return name; }
 	public Double getScore() { return score; }
 	public Character getStrand() { return strand; }
-	public Integer getThickStart() { return thickStart; }
-	public Integer getThickEnd() { return thickEnd; }
-	public Color getItemRgb() { return itemRgb; }
-	public int getBlockCount() { return blockCount; }
-	public int[] getBlockSizes() { return blockSizes; }
-	public int[] getBlockStarts() { return blockStarts; }
+	//public Integer getThickStart() { return thickStart; }
+	//public Integer getThickEnd() { return thickEnd; }
+	//public Color getItemRgb() { return itemRgb; }
+	//public int getBlockCount() { return blockCount; }
+	//public int[] getBlockSizes() { return blockSizes; }
+	//public int[] getBlockStarts() { return blockStarts; }
     
     public static Pattern chromPattern = Pattern.compile("chr(.*)");
 	
@@ -45,6 +45,7 @@ public class BEDLine {
 		name = array.length > 3 ? array[3] : null;
 		score = array.length > 4 ? (array[4].charAt(0)=='.' ? 0 :Double.parseDouble(array[4])) : null;
 		strand = array.length > 5 ? array[5].charAt(0) : null;
+		/*
 		thickStart = array.length > 6 ? Integer.parseInt(array[6]) : null;
 		thickEnd = array.length > 7 ? Integer.parseInt(array[7]) : null;
 		
@@ -74,7 +75,7 @@ public class BEDLine {
 					blockStarts[i] = Integer.parseInt(aa[i]);
 				}
 			}
-		}
+		}*/
 	}
 }
 

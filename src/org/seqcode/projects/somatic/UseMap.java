@@ -25,7 +25,7 @@ public class UseMap
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<File> searchers;
 	public MiniSystem nodeSystem;
-	public boolean  showPVal, addToOldFile, pics, equalWeight;
+	public boolean addToOldFile, pics, equalWeight;
 	public double[][] g;
 	public double[] sep;
 	public Color heatmapColorA=Color.red, heatmapColorB=Color.blue;
@@ -40,7 +40,6 @@ public class UseMap
 		locCol = locCols;
 		weightCol = weightCols;
 		pValnVal= 1000;
-		showPVal = true;
 		gini=0;
 		String mapp = map;
 		equalWeight = equalWeighting;
@@ -195,16 +194,17 @@ public class UseMap
 				if(!equalWeight)
 					weight/=count;
 				
-				if(showPVal){
-					for(int p = 1; p<g[0].length; p++){
-						for(int z=0; z<count; z++){
-							int ree = (int) (Math.random()*bins.size());
-							ree = nodeList.indexOf(bins.get(ree).myMini);
-							g[ree][p] += weight;
-						}
+			
+				//Random assignment of the same counts and weights to nodes
+				for(int p = 1; p<g[0].length; p++){
+					for(int z=0; z<count; z++){
+						int ree = (int) (Math.random()*bins.size());
+						ree = nodeList.indexOf(bins.get(ree).myMini);
+						g[ree][p] += weight;
 					}
 				}
-				
+			
+				//Actual assignment of the weight to all (count) assigned nodes
 				for(Integer i: inds)
 				{
 					bins.get(i).myMini.counting.add(bins.get(i));
@@ -281,29 +281,25 @@ public class UseMap
 	}
 	public double degreesP()
 	{
-		if(showPVal)
+		double slit = 0;
+		double avg = 0;
+		for(int i = 1; i < sep.length; i++)
 		{
-			double slit = 0;
-			double avg = 0;
-			for(int i = 1; i < sep.length; i++)
-			{
-				avg += sep[i];
-			}
-			avg /= pValnVal;
-			double std = 0;
-			for(int i = 1; i < pValnVal+1; i++)
-			{
-				std += (sep[i]-avg)*(sep[i]-avg);
-			}
-			if(std==0)
-				std = 0.00001;
-			std /= pValnVal;
-			std = Math.sqrt(std);
-			NormalDistribution norm = new NormalDistribution(avg,std);
-			slit = norm.cumulativeProbability(sep[0]);
-			return slit;
+			avg += sep[i];
 		}
-		else return 0;
+		avg /= pValnVal;
+		double std = 0;
+		for(int i = 1; i < pValnVal+1; i++)
+		{
+			std += (sep[i]-avg)*(sep[i]-avg);
+		}
+		if(std==0)
+			std = 0.00001;
+		std /= pValnVal;
+		std = Math.sqrt(std);
+		NormalDistribution norm = new NormalDistribution(avg,std);
+		slit = norm.cumulativeProbability(sep[0]);
+		return slit;
 	}
 	public double hexDist(int x1, int y1, int x2, int y2)
 	{
