@@ -26,6 +26,7 @@ public class UseMap
 	public ArrayList<File> searchers;
 	public MiniSystem nodeSystem;
 	public boolean addToOldFile, pics, equalWeight;
+	public boolean printGiniCurves=false;
 	public double[][] g;
 	public double[] sep;
 	public Color heatmapColorA=Color.red, heatmapColorB=Color.blue;
@@ -239,6 +240,7 @@ public class UseMap
 		double std = 0;
 		for(int i = 0; i< pValFind.length; i++)
 		{
+			//System.out.println(g[nodes][i+1]+"\t"+mean+"\t"+g[nodes][0]);
 			std += (g[nodes][i+1] - mean)*(g[nodes][i+1] - mean);
 		}
 		if(std!=0)
@@ -368,10 +370,14 @@ public class UseMap
 			
 			eQCumPop[0] = equal[0]/(double)nodeList.size();
 			eQCumWealth[0] = 0;
+			if(num==1  && printGiniCurves)
+				System.out.println("Random assignment curve");
 			for(int i = 1; i<equal.length; i++)
 			{
 				eQCumPop[i] = equal[i]/(double)nodeList.size() + eQCumPop[i-1];
 				eQCumWealth[i] = (equal[i]*i)/eQTotalWealth + eQCumWealth[i-1];
+				if(num==1 && printGiniCurves)
+					System.out.println(eQCumPop[i]+"\t"+eQCumWealth[i]);
 			}		
 			//Equality area
 			for(int i=0; i<equal.length-1; i++)
@@ -414,11 +420,16 @@ public class UseMap
 		uECumPop[0] = unequal[0]/(double)nodeList.size();
 		uECumWealth[0] = 0;
 		
+		if(printGiniCurves)
+			System.out.println("\nObserved assignment curve");
 		for(int i1 = 1; i1<unequal.length; i1++)
 		{
 			uECumPop[i1] = unequal[i1]/(double)nodeList.size() + uECumPop[i1-1];
 			
 			uECumWealth[i1] = (unequal[i1]*i1)/uETotalWealth + uECumWealth[i1-1];
+			
+			if(printGiniCurves)
+				System.out.println(uECumPop[i1]+"\t"+uECumWealth[i1]);
 		}
 		
 		//Lorenz area
