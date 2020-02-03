@@ -29,6 +29,7 @@ public class UseMap
 	public boolean printGiniCurves=false;
 	public double[][] g;
 	public double[] sep;
+	public double giniWLArea =0;
 	public Color heatmapColorA=Color.red, heatmapColorB=Color.blue;
 	
 	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean equalWeighting)
@@ -240,14 +241,15 @@ public class UseMap
 		double std = 0;
 		for(int i = 0; i< pValFind.length; i++)
 		{
-			//System.out.println(g[nodes][i+1]+"\t"+mean+"\t"+g[nodes][0]);
+			//if(i==0)
+			//	System.out.println(g[nodes][i+1]+"\t"+mean+"\t"+giniWLArea+"\t"+g[nodes][0]);
 			std += (g[nodes][i+1] - mean)*(g[nodes][i+1] - mean);
 		}
 		if(std!=0)
-		{
+		{	//System.out.println(std);
 			std/=pValnVal;
 			std = Math.sqrt(std);
-			g[nodes+1][1] = (g[nodes][0]-mean)/std;
+			g[nodes+1][1] = (giniWLArea-mean)/std;
 		}
 	}
 	public void degreesOfSep()
@@ -442,6 +444,7 @@ public class UseMap
 		double dArea = eArea - lArea;
 		gini = dArea / (lArea + dArea);
 		g[nodes][0] = gini;
+		giniWLArea = lArea;
 		gini=0;
 	}
 	public void gini()
