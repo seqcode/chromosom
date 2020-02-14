@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="somatic">
+<project name="chromosom">
 
   <property name="src.dir" location="src" />	
   <property name="lib.dir" location="lib" />
@@ -8,19 +8,12 @@
   <property name="build.dist.dir" location="${build.dir}/dist" />
   <property name="build.unjar.dir" location="${build.dir}/unjar" />
   <property name="build.compiler" value="javac1.8"/>
-  <property name="seqcode-core.classes.dir"  value="../seqcode-core/build/classes"/>
-  <property name="seqcode-core.lib.dir"  value="../seqcode-core/lib"/>
-  <property name="seqcode-core.unjar.dir"  value="../seqcode-core/build/unjar"/>
-	
+  
   <path id="compile.classpath">
     <pathelement location="${build.classes.dir}"/>
       <fileset dir="${lib.dir}">
         <include name="**/*.jar"/>
       </fileset>
-  	<pathelement location="${seqcode-core.classes.dir}"/>
-  	  <fileset dir="${seqcode-core.lib.dir}">
-  	    <include name="**/*.jar"/>
-  	  </fileset>
   </path>	
 
   <!-- ======================================================================= -->
@@ -103,43 +96,27 @@
     <mkdir dir="${build.unjar.dir}.tmp" />
     <unjar dest="${build.unjar.dir}.tmp">
       <fileset dir="${lib.dir}" includes="**/*.jar"/>
-	  <fileset dir="${seqcode-core.lib.dir}" includes="**/*.jar"/>
     </unjar>
     <move file="${build.unjar.dir}.tmp" tofile="${build.unjar.dir}" />
   </target>
 
-  <target name="requirepwset">
-    <fail unless="pwset"
-	  message="Must set pwset property.  This is a subdir of
-		   pwbasepath (${pwbasepath})."/>
-  </target>
-
-  <target name="setpwfilespath" depends="init, requirepwset" unless="${pwfiles.path}">
-    <property name="pwfiles.path" value="${pwbasepath}/${pwset}"/>
-  </target>
-
   	<!-- ======================================================================= -->
-	<!-- Target: makesomaticjar                                                  -->
+	<!-- Target: makechromosomjar                                                  -->
 	<!-- Depends: build, unjarall, setpwfilespath                         		 -->
 	<!-- Description: Compiles all the client source files and builds the jar    -->
-	<!--              for SOMATIC.                                              -->
-	<!--    ant -Dpwbasepath=/gpfs/group/sam77/default/code/pwfiles -Dpwset=public makesomaticjar     -->
+	<!--              for chromosom.                                              -->
+	<!--    ant makechromosomjar    											 -->
 	<!-- ======================================================================= -->
-  <target name="makesomaticjar" depends="build, unjarall, setpwfilespath">
+  <target name="makechromosomjar" depends="build, unjarall">
     <delete dir="${build.unjar.dir}/META-INF"/>
-    <jar destfile="${build.dist.dir}/somatic.${pwset}.jar" manifest="manifests/somatic_manifest.txt">	    
+    <jar destfile="${build.dist.dir}/chromosom.jar" manifest="manifests/chromosom_manifest.txt">	    
       <fileset dir="${build.classes.dir}" includes="**/*.class"/>
       <fileset dir="${build.classes.dir}" includes="**/*.properties"/>
       <fileset dir="${build.classes.dir}" includes="**/*.png"/>
       <fileset dir="${build.classes.dir}" includes="**/*.txt"/>
-      <fileset dir="${seqcode-core.classes.dir}" includes="**/*.class"/>
-      <fileset dir="${seqcode-core.classes.dir}" includes="**/*.properties"/>
-      <fileset dir="${seqcode-core.classes.dir}" includes="**/*.png"/>
-      <fileset dir="${seqcode-core.classes.dir}" includes="**/*.txt"/>
-      <fileset dir="${pwfiles.path}" includes="*"/>
       <fileset dir="${build.unjar.dir}"/>	    
     </jar>  
-    <chmod file="${build.dist.dir}/somatic.${pwset}.jar}" perm="755"/>
+    <chmod file="${build.dist.dir}/chromosom.jar}" perm="755"/>
   </target>
 
 	

@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 
 public class Region {
 

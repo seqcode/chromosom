@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import javax.swing.*;

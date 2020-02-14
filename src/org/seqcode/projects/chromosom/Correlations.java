@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;

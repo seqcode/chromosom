@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Font;

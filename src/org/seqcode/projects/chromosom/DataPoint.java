@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 public class DataPoint 
 {
 	public String look;

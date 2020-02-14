@@ -1,4 +1,4 @@
-package org.seqcode.projects.somatic;
+package org.seqcode.projects.chromosom;
 
 import java.io.BufferedReader;
 import java.io.File;
