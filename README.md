@@ -98,7 +98,7 @@ In the above, "GM12878_250kb_50x50_pearson.som" is a path to the file containing
 
 You can reproduce most of the figures and analyses from the manuscript by navigating to the "example" directory in this repo and executing the run.sh script. Note that you will need the following prerequisties for aspects of the analyses and production of figures:
 * Java v1.8+
-* ChromoSOM JAR file, added to PATH
+* ChromoSOM JAR file, added to example directory
 * MultiMDS [https://github.com/seqcode/multimds]
 * Python v2.7+
 * Python libraries:
