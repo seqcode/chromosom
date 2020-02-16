@@ -82,7 +82,7 @@ public class DrawHex extends JPanel
 		}
 	    try 
 	    {
-	        File outputfile = new File(outDir.getAbsolutePath()+"/"+name+".png");
+	        File outputfile = new File(outDir.getAbsolutePath()+File.separator+name+".png");
 	        ImageIO.write(image, "png", outputfile);
 	    } catch (IOException e) {}
 	}
@@ -95,7 +95,7 @@ public class DrawHex extends JPanel
 	    print(g);
 	    try 
 	    {
-	        File outputfile = new File(outDir.getAbsolutePath()+"/"+name+".png");
+	        File outputfile = new File(outDir.getAbsolutePath()+File.separator+name+".png");
 	        ImageIO.write(bi, "png", outputfile);
 	    } catch (IOException e) {}
 	}

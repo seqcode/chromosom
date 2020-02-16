@@ -20,7 +20,7 @@ public class UseMap
 	public String fold, mapper;
 	public File outDir;
 	public double gini, pVal;
-	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, locCol, weightCol, binSize;
+	public int nodes,xs,ys,xNodes,yNodes, maxBins, minBins, colorNum, winW, winH, pValnVal, binSize;
 	public ArrayList<DataPoint> bins;
 	public ArrayList<MiniNode> nodeList;
 	public ArrayList<File> searchers;
@@ -32,15 +32,13 @@ public class UseMap
 	public double giniWLArea =0;
 	public Color heatmapColorA=Color.red, heatmapColorB=Color.blue;
 	
-	public UseMap(String map, String fillle, String outdir, int locCols, int weightCols, boolean pic, boolean equalWeighting)
+	public UseMap(String map, String fillle, String outdir, boolean pic, boolean equalWeighting)
 	{
 		pics = pic;
 		mapper = map;
 		fold = fillle;
 		File folder = new File(fillle);
 		outDir =new File(outdir);
-		locCol = locCols;
-		weightCol = weightCols;
 		pValnVal= 1000;
 		gini=0;
 		String mapp = map;
@@ -138,7 +136,6 @@ public class UseMap
 		if(pics)
 		{
 			System.out.println(file1.getName()+" vs. "+file2.getName());
-			//d.search(fold+"/"+file, locCol, weightCol);
 			d.multiSearch(file1, file2);
 			d.repaint();
 			d.saveImg(file1.getName()+"_vs_"+file2.getName(), outDir, 2000, 2000);
@@ -148,8 +145,8 @@ public class UseMap
 	{
 		if(pics)
 		{
-			d.equalWeight = (weightCol == -1);
-			d.search(file, locCol, weightCol);
+			d.equalWeight = equalWeight;
+			d.search(file);
 			d.repaint();
 			d.saveImg(file.getName(), outDir, 2000, 2000);
 		}
@@ -600,7 +597,7 @@ public class UseMap
 		{
 			FileWriter ff;
 			if(pics)
-				ff = new FileWriter(outDir+ "/"+"lorenz_analysis.txt",false);  
+				ff = new FileWriter(outDir+File.separator+"lorenz_analysis.txt",false);  
 			else
 				ff = new FileWriter("lorenz_analysis.txt",false);
 			b = new BufferedWriter(ff);

@@ -26,12 +26,14 @@ public class Correlations
 	public boolean weighting, showPVal, addToOldFile, pics, equalWeight;
 	public double[][] g;
 	public double[] sep;
+	public String outDir;
 	
-	public Correlations(String map, ArrayList<String> fillle)
+	public Correlations(String map, ArrayList<String> fillle, String outDirectory)
 	{
 		equalWeight = true;
 		mapper = map;
 		fold = fillle;
+		outDir = outDirectory;
 		locCol = 0;
 		weightCol = 1;
 		pValnVal= 1000;
@@ -290,7 +292,9 @@ public class Correlations
 		try 
 		{
 			FileWriter ff;
-			ff = new FileWriter("cors.txt",true);
+			File outDirectory = new File(outDir);
+			String filename = outDirectory.getAbsolutePath()+File.separator+"correlations.txt";
+			ff = new FileWriter(filename,true);
 			b = new BufferedWriter(ff);
 			PrintWriter printer = new PrintWriter(b);
 			printer.print("\t");

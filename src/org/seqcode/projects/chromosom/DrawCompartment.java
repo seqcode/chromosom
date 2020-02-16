@@ -130,7 +130,7 @@ public class DrawCompartment extends JPanel
 	    print(gg);
 	    try 
 	    {
-	        File outputfile = new File(dir.getAbsolutePath()+"/"+name+".png");
+	        File outputfile = new File(dir.getAbsolutePath()+File.separator+name+".png");
 	        ImageIO.write(image, "png", outputfile);
 	    } catch (IOException e) {}
 	}

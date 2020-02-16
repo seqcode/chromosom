@@ -1,35 +1,45 @@
 package org.seqcode.projects.chromosom;
-import java.awt.BorderLayout;
+
 import java.util.ArrayList;
-import javax.swing.*;
 
 
-public class MultiMap extends JFrame
+public class SOMTrainer
 {
-    static MultiMap window2;
-    int winW, winH;
-	public DrawHex d;
-	public UseMap u;
-	private static final long serialVersionUID = 1L;
-	public ArrayList<String> s;
-	public String find;
-	public MultiMap(int x, int y, String p)
-	  {
-		 
-		//title the window
-	    super(p);
-	    
-	    BorderLayout gui = new BorderLayout();
-	    setLayout(gui);
-	    winW = x; winH = y;
-	    
-	    s = new ArrayList<String>();
-	  }
+	protected int numRounds, xNode, yNode;
+	protected double sigma, sigmaStop;
+	protected int iterations;
+	protected boolean useCosineSim, countIntraChrom;
+	protected String outPrefix, matrixFilePath;
+	protected int availibleThreads;
 	
+	public SOMTrainer(int numRounds, int xNode, int yNode, double sigma, double sigmaStop, int iterations, boolean cosineSim, String outPrefix, String matrixFilePath, int availibleThreads, boolean countIntraChrom)
+	{
+		this.numRounds = numRounds;
+		this.xNode = xNode;
+		this.yNode = yNode;
+		this.sigma = sigma;
+		this.sigmaStop = sigmaStop;
+		this.iterations = iterations;
+		this.useCosineSim = cosineSim;
+		this.outPrefix = outPrefix;
+		this.matrixFilePath=matrixFilePath;
+		this.availibleThreads = availibleThreads;
+		this.countIntraChrom = countIntraChrom;
+	}
 	
+	protected void train(){
+		ArrayList<ThreadMap> op = new ArrayList<ThreadMap>();
+	    for(int i = 0; i< numRounds; i++)
+	    {
+    	    System.out.println("training");
+	    	ThreadMap o = new ThreadMap(xNode, yNode, sigma, sigmaStop, iterations, useCosineSim, outPrefix, matrixFilePath, availibleThreads, countIntraChrom);
+		 		o.go();
+		 		op.add(o);
+	    }
+	    qualityControl(op, useCosineSim).writeFile(numRounds);
+	}
 	
-	/** will this being static cause problems? */
-	public static ThreadMap qualityControl(ArrayList<ThreadMap> op, boolean similarity)
+	protected ThreadMap qualityControl(ArrayList<ThreadMap> op, boolean similarity)
 	{
 
 		ThreadMap best = op.get(0);
@@ -88,16 +98,10 @@ public class MultiMap extends JFrame
 			numberOfSoms = nnnn;
 			t = new ArrayList<ThreadMap>();
 		}
-//		public void run()
-//		{
-//			for(int i = 0; i < numberOfSoms; i++)
-//			{
-//    	    	ThreadMap o = new ThreadMap(xArg,yArg,sigmaArg, lr, iter, Integer.parseInt(args[7]), Integer.parseInt(args[8]), Integer.parseInt(args[9]), args[10], args[11], threadsFor));
-//   		 		o.go();
-//   		 		t.add(o);
-//    	    }
-//		}
+
 	}
+	
+	
 	public class UniMapThread extends Thread
 	{
 		int threadsFor, numberOfSoms;
@@ -109,8 +113,10 @@ public class MultiMap extends JFrame
 			t = new ArrayList<ThreadMap>();
 		}
 	}
-	 public static void main(String[] args)
-	  {
+	
+	//Replacing this main method functionality with function in ChromoSOM main class
+	public static void main(String[] args)
+	{
 		 //to train: args = "train" 'int x' 'int y' 'int sigma' 'double learn rate' 'int iterations' 'int n' 'cosine sim' 'weight by dps' 'exponential decay' 'name' 'matrix file' 'number of threads'
     	if(args[0].equalsIgnoreCase(("Train")))
     	{
@@ -152,38 +158,18 @@ public class MultiMap extends JFrame
     	    } catch (NumberFormatException e) {
     	        System.err.println("Argument" + args[6] + " is not an integer. n set to 10 by default");
     	    }
-    	    ArrayList<ThreadMap> op = new ArrayList<ThreadMap>();
-    	    for(int i = 0; i< n; i++)
-    	    {
-        	    System.out.println("training");
-    	    	ThreadMap o = new ThreadMap(xArg,yArg, sig, sigStop, iter, Integer.parseInt(args[7]) , args[8], args[9], Integer.parseInt(args[10]), Integer.parseInt(args[11])==1);
-   		 		o.go();
-   		 		op.add(o);
-    	    }
-    	    boolean boo = Integer.parseInt(args[7]) == 1;
-    	    qualityControl(op, boo).writeFile(n);
+    	    
+    	    boolean cosine = Integer.parseInt(args[7])==1;
+    	    String outPrefix = args[8];
+    	    String mat = args[9];
+    	    int availThreads = Integer.parseInt(args[10]);
+    	    boolean countIntra = Integer.parseInt(args[11])==1;
+    	    
+    	    SOMTrainer trainer = new SOMTrainer(n, xArg,yArg, sig, sigStop, iter, cosine, outPrefix, mat, availThreads, countIntra);
+    	    trainer.train();
+    	    
     	}
-    	//train 10 10 15 LR iterations n 1 1 1 "Name" "File Name" 4 2
-    	if(args[0].equalsIgnoreCase(("Test")))
-    	{
-    		ArrayList<ThreadMap> op = new ArrayList<ThreadMap>();
-    	    int j = 20;
-    	    for(int lr = 1; lr <=3; lr++)
-    	    {   
-	    	    while (j>4)
-	    	    {
-		    		for(int i = 1; i< 5; i++)
-		    	    {
-		    			//"Test" "Name" "FileName" Threads
-		    	    	//ThreadMap o = new ThreadMap(50,50, j, lr, 500, 1, 1, 1, args[1], args[2], Integer.parseInt(args[3]), i);
-		   		 		//o.go();
-		   		 		//op.add(o);
-		   		 		qualityControl(op, true).writeFile(1);
-		    	    }
-		    	    j-=5;
-		    	}
-    		}
-    	}
+    	
 	}
 	 
 }

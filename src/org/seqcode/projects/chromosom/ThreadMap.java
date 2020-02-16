@@ -36,7 +36,7 @@ public class ThreadMap
 	
 	public String filePrefix;
 	
-	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, int cosine, String outPrefix, String mat, int availibleThreads, boolean countIntraChrom)
+	public ThreadMap(int xNode, int yNode, double sigma, double sigmaStop, int it, boolean cosine, String outPrefix, String mat, int availibleThreads, boolean countIntraChrom)
 	{
 		countIntraChromosomal = countIntraChrom;
 		sgmStop = sigmaStop;
@@ -56,7 +56,7 @@ public class ThreadMap
 		String ff = mat;
 		filePrefix = outPrefix;
 		reader = new Reader(ff);
-		cos = cosine == 1;
+		cos = cosine;
 		timerElse =0; timerIterate = 0; timerAssign = 0;
 	}
 	public class IterateThread extends Thread
@@ -779,7 +779,7 @@ public class ThreadMap
 								printer.print(", ");
 						}
 					}
-					printer.print(")" + "\t");
+					printer.print(")" + "\n");
 				}
 				printer.print("\n");
 			}
