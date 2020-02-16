@@ -31,6 +31,7 @@ public class ChromoSOM {
 	boolean nodes = false;
 	boolean flipColors = false;
 	boolean runCorrelation = false;
+	boolean runPairwise = false;
 	
 	
 	public ChromoSOM(String [] args, boolean noHelp) {
@@ -129,10 +130,14 @@ public class ChromoSOM {
 					useWeights = ap.hasKey("useweights");
 					flipColors = ap.hasKey("flipcolors");
 					runCorrelation = ap.hasKey("correlation");
+					runPairwise = ap.hasKey("pairwise");
 					
-					useSOM();
 					if(runCorrelation)
 						corSOM();
+					else if(runPairwise)
+						useSOMpairwise();
+					else
+						useSOM();
 				}
 			}
 		}
@@ -194,6 +199,13 @@ public class ChromoSOM {
 		analyzer.useSOM(somFilename, searchDirectory, outDirectory, !useWeights, flipColors);
 	}
 	/**
+	 * Project pairs of datasets to a trained SOM
+	 */
+	public void useSOMpairwise(){
+		SOMAnalysis analyzer = new SOMAnalysis();
+		analyzer.useSOMpairwise(somFilename, searchDirectory, outDirectory, !useWeights, flipColors);
+	}
+	/**
 	 * Run correlation between datasets on a trained SOM
 	 */
 	public void corSOM(){
@@ -241,6 +253,7 @@ public class ChromoSOM {
 			"\t--searchdir <directory name>: directory containing search files\n"+
 			"\t--out <output directory>: output directory\n" +
 			"\t--correlation: run correlation analysis between all pairs of datasets\n" +
+			"\t--pairwise: run pairwise projections for all pairs of datasets\n" +
 			"\t--useweights: use weights defined in BED file score column\n";
 	}
 	

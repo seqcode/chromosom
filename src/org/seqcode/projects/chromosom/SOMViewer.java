@@ -153,7 +153,7 @@ public class SOMViewer extends JFrame
             	File trained=null;
  	    		JFileChooser chooser = new JFileChooser();
  	    	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
- 	    	        "TXT files", "txt");
+ 	    	        "SOM files", "som");
  	    	    chooser.setFileFilter(filter);
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    int returnVal = chooser.showOpenDialog(self);
@@ -173,7 +173,7 @@ public class SOMViewer extends JFrame
             	File trained=null, trained2=null;
  	    		JFileChooser chooser = new JFileChooser();
  	    	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
- 	    	        "TXT files", "txt");
+ 	    	        "SOM files", "som");
  	    	    chooser.setFileFilter(filter);
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    int returnVal = chooser.showOpenDialog(self);
@@ -183,7 +183,7 @@ public class SOMViewer extends JFrame
  	    	    //Execute when search is pressed
  	    		chooser = new JFileChooser();
  	    	    filter = new FileNameExtensionFilter(
- 	    	        "TXT files", "txt");
+ 	    	        "SOM files", "som");
  	    	    chooser.setFileFilter(filter);
  	    	    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
  	    	    returnVal = chooser.showOpenDialog(self);
