@@ -1,7 +1,7 @@
 # ChromoSOM example analysis
 
 ## This is the top-level execution script. 
-## See the README for prerequisites. All execution scripts assume that chromosom.jar has been added to the PATH. 
+## See the README for prerequisites. All execution scripts assume that chromosom.jar has been added to the examples directory (i.e. the same directory as this file)
 
 ## Note that you can skip Hi-C data download and SOM training by unzipping som/GM12878_250kb_50x50_pearson.som.gz and then skipping to step 3) below
 
