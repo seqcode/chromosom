@@ -1,0 +1,4 @@
+https://www.encodeproject.org/metadata/?type=Experiment&files.output_type=peaks&files.file_type=bed+narrowPeak&files.assembly=hg19&files.lab.title=ENCODE+Processing+Pipeline&files.status=released -X GET -H "Accept: text/tsv" -H "Content-Type: application/json" --data '{"elements": ["/experiments/ENCSR000EJD/","/experiments/ENCSR000EMT/"]}'
+https://www.encodeproject.org/files/ENCFF097LEF/@@download/ENCFF097LEF.bed.gz
+https://www.encodeproject.org/files/ENCFF273MVV/@@download/ENCFF273MVV.bed.gz
+https://www.encodeproject.org/files/ENCFF804BNU/@@download/ENCFF804BNU.bed.gz

@@ -1,0 +1,27 @@
+https://www.encodeproject.org/metadata/?type=Experiment&files.output_type=replicated+peaks&files.file_type=bed+narrowPeak -X GET -H "Accept: text/tsv" -H "Content-Type: application/json" --data '{"elements": ["/experiments/ENCSR000DRX/","/experiments/ENCSR436QMA/","/experiments/ENCSR398JTO/","/experiments/ENCSR000BNF/","/experiments/ENCSR360XQV/","/experiments/ENCSR000BMS/","/experiments/ENCSR237VSG/","/experiments/ENCSR136WQZ/","/experiments/ENCSR713ONE/","/experiments/ENCSR000BVP/","/experiments/ENCSR956WYO/","/experiments/ENCSR890ZMI/","/experiments/ENCSR000EJD/","/experiments/ENCSR553NUG/","/experiments/ENCSR596QDC/","/experiments/ENCSR000AKJ/","/experiments/ENCSR000AKH/","/experiments/ENCSR000AKD/","/experiments/ENCSR000DRY/","/experiments/ENCSR000EAB/","/experiments/ENCSR000AKI/","/experiments/ENCSR000AOV/","/experiments/ENCSR000AKA/","/experiments/ENCSR000EMT/","/experiments/ENCSR000EAF/","/experiments/ENCSR000AOX/","/experiments/ENCSR000AOW/","/experiments/ENCSR000EYX/","/experiments/ENCSR000BGH/","/experiments/ENCSR000AKE/","/experiments/ENCSR142REC/","/experiments/ENCSR000DRV/","/experiments/ENCSR785WMC/","/experiments/ENCSR000AKF/","/experiments/ENCSR057BWO/","/experiments/ENCSR000BGJ/","/experiments/ENCSR000DRW/","/experiments/ENCSR000AKC/","/experiments/ENCSR000AKG/"]}'
+https://www.encodeproject.org/files/ENCFF636FWF/@@download/ENCFF636FWF.bed.gz
+https://www.encodeproject.org/files/ENCFF354MGT/@@download/ENCFF354MGT.bed.gz
+https://www.encodeproject.org/files/ENCFF851UKZ/@@download/ENCFF851UKZ.bed.gz
+https://www.encodeproject.org/files/ENCFF035PQG/@@download/ENCFF035PQG.bed.gz
+https://www.encodeproject.org/files/ENCFF188SZS/@@download/ENCFF188SZS.bed.gz
+https://www.encodeproject.org/files/ENCFF295GNH/@@download/ENCFF295GNH.bed.gz
+https://www.encodeproject.org/files/ENCFF453PEP/@@download/ENCFF453PEP.bed.gz
+https://www.encodeproject.org/files/ENCFF921LKB/@@download/ENCFF921LKB.bed.gz
+https://www.encodeproject.org/files/ENCFF153VOQ/@@download/ENCFF153VOQ.bed.gz
+https://www.encodeproject.org/files/ENCFF247VUO/@@download/ENCFF247VUO.bed.gz
+https://www.encodeproject.org/files/ENCFF052MHA/@@download/ENCFF052MHA.bed.gz
+https://www.encodeproject.org/files/ENCFF069KAG/@@download/ENCFF069KAG.bed.gz
+https://www.encodeproject.org/files/ENCFF213GPU/@@download/ENCFF213GPU.bed.gz
+https://www.encodeproject.org/files/ENCFF357HZM/@@download/ENCFF357HZM.bed.gz
+https://www.encodeproject.org/files/ENCFF025VJJ/@@download/ENCFF025VJJ.bed.gz
+https://www.encodeproject.org/files/ENCFF308WNH/@@download/ENCFF308WNH.bed.gz
+https://www.encodeproject.org/files/ENCFF228GWY/@@download/ENCFF228GWY.bed.gz
+https://www.encodeproject.org/files/ENCFF795URC/@@download/ENCFF795URC.bed.gz
+https://www.encodeproject.org/files/ENCFF512VHW/@@download/ENCFF512VHW.bed.gz
+https://www.encodeproject.org/files/ENCFF584NAD/@@download/ENCFF584NAD.bed.gz
+https://www.encodeproject.org/files/ENCFF479XLN/@@download/ENCFF479XLN.bed.gz
+https://www.encodeproject.org/files/ENCFF268HMO/@@download/ENCFF268HMO.bed.gz
+https://www.encodeproject.org/files/ENCFF367KIF/@@download/ENCFF367KIF.bed.gz
+https://www.encodeproject.org/files/ENCFF816AHV/@@download/ENCFF816AHV.bed.gz
+https://www.encodeproject.org/files/ENCFF108JKZ/@@download/ENCFF108JKZ.bed.gz
+https://www.encodeproject.org/files/ENCFF983SMS/@@download/ENCFF983SMS.bed.gz

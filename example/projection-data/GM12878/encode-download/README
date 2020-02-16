@@ -1,0 +1,12 @@
+file-list1.txt:
+	Selected all histone ChIP-seq datasets from GM12878 / hg19 on ENCODE portal. Added to cart.
+	Selected "replicated peaks" and "bed narrowPeak" file types to download (13 files)
+
+file-list2.txt:
+	Selected all TF ChIP-seq datasets from GM12878 / hg19 on ENCODE portal. Added to cart.
+	Selected "conservative IDR thresholded peaks" and "bed narrowPeak" file types to download (158 files)
+
+file-list3.txt:
+	Selected all DNase-seq datasets from GM12878 / hg19 on ENCODE portal. Added to cart.
+	Selected "released" and "bed narrowPeak" file types to download (3 files)
+
