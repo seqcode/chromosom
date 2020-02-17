@@ -11,7 +11,7 @@ This directory contains example execution of ChromoSOM, including the following 
 __Prerequisites:__
 
 * Java v1.8+
-* ChromoSOM JAR file, added to PATH
+* ChromoSOM JAR file, added to the examples directory (i.e. this directory)
 * MultiMDS [https://github.com/seqcode/multimds]
 * Python v2.7+
 * Python libraries: 
