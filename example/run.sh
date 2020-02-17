@@ -27,6 +27,9 @@ cd encode-download
 sh download.sh
 sh process.sh
 cd ..
+cd chromatin-state
+sh convert.sh
+cd ..
 cd ../..
 
 ## 4) Project data to the trained SOM and analyze
